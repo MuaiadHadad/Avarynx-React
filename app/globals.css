@@ -1,0 +1,235 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Avatar styling to make it visible */
+.avatar-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+#avatar-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#avatar-display {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#avatar-display canvas {
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+}
+
+#avatar-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+/* Loading indicator */
+#avatar-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+#avatar-loading-value {
+  color: #667eea;
+  font-weight: 500;
+  margin-top: 1rem;
+  font-size: 14px;
+}
+
+#avatar-loading-back,
+#avatar-loading-top {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Chat transcript styling with markdown support */
+.chat-transcript {
+  display: flex !important;
+  flex-direction: column;
+  /*max-height: 400px;*/
+  overflow-y: auto;
+  height: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0);
+}
+
+.chat-msg {
+  margin: 0.5rem 0;
+  padding: 0.8rem 1rem;
+  border-radius: 18px;
+  max-width: 80%;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.chat-msg.user {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+  text-align: right;
+}
+
+.chat-msg.assistant {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  align-self: flex-start;
+  margin-right: auto;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Markdown styling for assistant messages */
+.chat-msg.assistant h1,
+.chat-msg.assistant h2,
+.chat-msg.assistant h3,
+.chat-msg.assistant h4,
+.chat-msg.assistant h5,
+.chat-msg.assistant h6 {
+  margin: 0.5em 0 0.3em 0;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.chat-msg.assistant h1 {
+  font-size: 1.2em;
+}
+.chat-msg.assistant h2 {
+  font-size: 1.1em;
+}
+.chat-msg.assistant h3 {
+  font-size: 1.05em;
+}
+
+.chat-msg.assistant p {
+  margin: 0.5em 0;
+  line-height: 1.5;
+}
+
+.chat-msg.assistant ul,
+.chat-msg.assistant ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.chat-msg.assistant li {
+  margin: 0.2em 0;
+}
+
+.chat-msg.assistant code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.chat-msg.assistant pre {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.8em;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.chat-msg.assistant pre code {
+  background: none;
+  padding: 0;
+}
+
+.chat-msg.assistant blockquote {
+  border-left: 3px solid #667eea;
+  padding-left: 1em;
+  margin: 0.5em 0;
+  font-style: italic;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.5em 1em;
+  border-radius: 0 5px 5px 0;
+}
+
+.chat-msg.assistant strong {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.chat-msg.assistant em {
+  font-style: italic;
+}
+
+.chat-msg.assistant a {
+  color: #667eea;
+  text-decoration: underline;
+}
+
+.chat-msg.assistant a:hover {
+  color: #5a67d8;
+}
+
+.chat-msg.assistant table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.5em 0;
+  font-size: 0.9em;
+}
+
+.chat-msg.assistant th,
+.chat-msg.assistant td {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 0.3em 0.5em;
+  text-align: left;
+}
+
+.chat-msg.assistant th {
+  background: rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+}
+
+.chat-msg.assistant hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  margin: 1em 0;
+}

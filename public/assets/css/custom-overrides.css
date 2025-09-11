@@ -1,0 +1,237 @@
+/* ================================
+   Custom overrides: Banner layout
+   ================================ */
+
+/* Banner área vira flex, altura total */
+.tj-banner-section-2 .banner-area {
+  display: flex;
+  min-height: 94vh;
+  max-width: 100%;
+  align-items: stretch;
+}
+
+/* Painéis em coluna */
+.tj-banner-section-2 .banner-left-box,
+.tj-banner-section-2 .banner-right-box {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Avatar container ocupa espaço no painel direito */
+.tj-banner-section-2 .banner-right-box .avatar-container {
+  flex: 0 0 auto;
+  height: 76vh; /* avatar maior */
+  min-height: 520px; /* altura mínima maior para desktop */
+  max-height: 92vh; /* limite superior seguro */
+}
+
+/* Painel esquerdo ajustes */
+.tj-banner-section-2 .banner-left-box {
+  position: relative;
+}
+
+/* Logo no topo esquerdo */
+.tj-banner-section-2 .banner-left-box .left-box-logo {
+  position: absolute;
+  top: 5px;
+  left: 16px;
+  z-index: 5;
+}
+.tj-banner-section-2 .banner-left-box .left-box-logo img {
+  height: 150px;
+  width: auto;
+  display: block;
+}
+
+/* Contact form ocupa espaço entre logo e barra */
+.tj-banner-section-2 .banner-left-box .contact-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: 0 !important; /* remove espaço extra */
+}
+
+/* Bootstrap row em coluna */
+.tj-banner-section-2 .banner-left-box .contact-form .row {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Transcript alinhado com avatar-display e altura controlada */
+.tj-banner-section-2 .banner-left-box {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  /*min-height: 0;*/
+  height: 86vh; /* mesma altura do avatar-display */
+  /*min-height: 520px;       !* mesma altura mínima do avatar *!*/
+  max-height: 92vh; /* mesmo limite máximo do avatar */
+  overflow-y: auto; /* ativa scroll vertical */
+  gap: 8px;
+  /*padding: 12px;*/
+  /*padding-bottom: 96px;*/
+  scroll-padding-bottom: 96px;
+  border-radius: 12px;
+}
+
+/* Mensagens (bolhas) */
+.tj-banner-section-2 .banner-left-box .chat-transcript .chat-msg {
+  max-width: 78%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  word-break: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+.tj-banner-section-2 .banner-left-box .chat-transcript .chat-msg.user {
+  align-self: flex-end;
+  background: rgba(136, 204, 255, 0.18);
+  color: var(--colorUserText);
+  border: 1px solid var(--colorBorderPassive);
+  border-bottom-right-radius: 4px;
+}
+.tj-banner-section-2 .banner-left-box .chat-transcript .chat-msg.assistant {
+  align-self: flex-start;
+  background: rgba(204, 119, 255, 0.18);
+  color: var(--colorSystemText);
+  border: 1px solid rgba(204, 119, 255, 0.35);
+  border-bottom-left-radius: 4px;
+}
+
+/* Barra de mensagem colada no fundo do painel */
+.tj-banner-section-2 .banner-left-box .message-input {
+  margin-top: auto;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 10;
+  background: var(--tj-color-theme-bg, rgba(255, 255, 255, 0));
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.15);
+  padding-top: 8px;
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+/* Textarea */
+.tj-banner-section-2 .banner-left-box .message-input textarea {
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  line-height: 48px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-right: 56px; /* espaço p/ botão */
+  border-radius: 50px;
+  border-color: #5a67d8;
+  resize: none;
+  overflow: hidden;
+}
+
+/* Botão dentro da barra */
+.tj-banner-section-2 .banner-left-box .message-input .submit-inside {
+  position: absolute;
+  right: 8px;
+
+  top: 50%;
+  transform: translateY(-50%);
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tj-banner-section-2 .banner-left-box .message-input .submit-inside .btn-inner {
+  display: inline-flex;
+  gap: 6px;
+}
+.tj-banner-section-2 .banner-left-box .message-input .submit-inside .btn-text {
+  display: none;
+}
+
+/* Versão mobile: barra fixa no fundo da janela */
+@media (max-width: 767px) {
+  .tj-banner-section-2 .banner-left-box .message-input {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  .tj-banner-section-2 .banner-left-box .chat-transcript {
+    padding-bottom: 120px;
+    scroll-padding-bottom: 120px;
+  }
+}
+
+/* ================================
+   Avatar + Ad slot layout tweaks
+   ================================ */
+/* Right column stacks items with a gap and keeps content at the top */
+.tj-banner-section-2 .banner-right-box {
+  gap: 16px;
+  justify-content: flex-start;
+}
+
+/* Ad slot directly under the avatar */
+.tj-banner-section-2 .banner-right-box .ad-slot {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 180px; /* anúncio menor em desktop */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(136, 204, 255, 0.5);
+  border-radius: 10px;
+  background: rgba(136, 204, 255, 0.06);
+  color: var(--colorBody);
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.tj-banner-section-2 .banner-right-box .ad-slot .ad-placeholder {
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+/* Keep rating box below the ad */
+.tj-banner-section-2 .banner-right-box .rating-box-area {
+  flex: 0 0 auto;
+}
+
+/* Mobile/tablet adjustments */
+@media (max-width: 1199px) {
+  .tj-banner-section-2 .banner-right-box .avatar-container {
+    height: 60vh; /* avatar continua grande em tablets */
+    min-height: 420px;
+  }
+  .tj-banner-section-2 .banner-right-box .ad-slot {
+    min-height: 100px; /* anúncio menor em tablets */
+  }
+}
+
+@media (max-width: 767px) {
+  .tj-banner-section-2 .banner-right-box {
+    gap: 12px;
+  }
+  .tj-banner-section-2 .banner-right-box .avatar-container {
+    height: 55vh; /* avatar ainda maior vs antes */
+    min-height: 320px;
+  }
+  .tj-banner-section-2 .banner-right-box .ad-slot {
+    min-height: 80px; /* anúncio menor em mobile */
+  }
+}
+
+/* Ensure avatar side has no painted background */
+.tj-banner-section-2 .banner-right-box,
+.tj-banner-section-2 .banner-right-box .avatar-container,
+.tj-banner-section-2 .banner-right-box #avatar-display,
+.tj-banner-section-2 .banner-right-box canvas {
+  background: transparent !important;
+}

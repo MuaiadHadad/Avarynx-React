@@ -1,0 +1,9 @@
+# Ignore build output and external assets
+.next/
+node_modules/
+public/assets/
+public/fonts/
+public/images/
+public/modules/
+public/avatars/
+
