@@ -20,7 +20,7 @@
 /* Avatar container ocupa espaço no painel direito */
 .tj-banner-section-2 .banner-right-box .avatar-container {
   flex: 0 0 auto;
-  height: 76vh; /* avatar maior */
+  height: 73vh; /* avatar maior */
   min-height: 520px; /* altura mínima maior para desktop */
   max-height: 92vh; /* limite superior seguro */
 }
@@ -68,7 +68,7 @@
   flex-direction: column;
   flex: 1 1 auto;
   /*min-height: 0;*/
-  height: 86vh; /* mesma altura do avatar-display */
+  height: 88vh; /* mesma altura do avatar-display */
   /*min-height: 520px;       !* mesma altura mínima do avatar *!*/
   max-height: 92vh; /* mesmo limite máximo do avatar */
   overflow-y: auto; /* ativa scroll vertical */
@@ -137,7 +137,6 @@
 .tj-banner-section-2 .banner-left-box .message-input .submit-inside {
   position: absolute;
   right: 8px;
-
   top: 50%;
   transform: translateY(-50%);
   height: 36px;
