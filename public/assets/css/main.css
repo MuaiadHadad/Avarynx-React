@@ -10775,6 +10775,7 @@ START: Contact CSS
   margin-inline-start: 0;
   -webkit-margin-end: 15px;
   margin-inline-end: 15px;
+    width: 100%;
   padding: 1px 10px;
   border-radius: 12px;
 }

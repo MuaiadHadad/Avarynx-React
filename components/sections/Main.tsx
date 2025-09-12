@@ -22,7 +22,11 @@ export default function Main() {
               <div className="col-sm-12">
                 <div
                   className="form-input message-input"
-                  style={{ backgroundColor: 'transparent' }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    borderRadius: '25px',
+                    border: '2px solid #ccc',
+                  }}
                 >
                   <textarea
                     name="cfMessage"
@@ -30,17 +34,25 @@ export default function Main() {
                     rows={1}
                     aria-label="Message"
                     placeholder="Talk with me.."
+                    style={{
+                      borderRadius: '25px',
+                      border: 'none',
+                      outline: 'none',
+                      padding: '2px 60px 15px 20px',
+                    }}
                   ></textarea>
                   <button
                     className="tj-primary-btn submit-inside"
                     type="submit"
                     aria-label="Send message"
+                    style={{
+                      backgroundColor: 'transparent',
+                      borderRadius: '100%',
+                      transition: 'none',
+                      animation: 'none',
+                    }}
                   >
-                    <span className="btn-inner">
-                      <span className="btn-icon">
-                        <i className="tji-arrow-right"></i>
-                      </span>
-                    </span>
+                    <i className="tji-plane"></i>
                   </button>
                 </div>
               </div>
