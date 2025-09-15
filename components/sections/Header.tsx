@@ -1,7 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-export default function Header() {
+import Link from 'next/link';
+
+type HeaderProps = {
+  onLoginClickAction?: () => void;
+};
+
+export default function Header({ onLoginClickAction }: HeaderProps) {
   return (
     <>
       {/* Header */}
@@ -12,18 +18,18 @@ export default function Header() {
               <div className="col-12">
                 <div className="header-wrapper" style={{ padding: '5px 0' }}>
                   <div className="site_logo">
-                    <a className="logo" href="index.html">
+                    <Link className="logo" href="/">
                       <img
                         src="/assets/images/logos/logoA.webp"
                         alt="Logo"
                         style={{ height: '60px' }}
                       />
-                    </a>
+                    </Link>
                   </div>
                   <div className="header-right-item d-none d-lg-inline-flex">
                     <div className="header-button">
-                      <a className="tj-primary-btn" href="contact.html">
-                        <div className="btn-inner" >
+                      <button type="button" onClick={onLoginClickAction} className="tj-primary-btn">
+                        <div className="btn-inner">
                           <span className="btn-icon h-icon">
                             <i className="tji-arrow-right"></i>
                           </span>
@@ -32,7 +38,7 @@ export default function Header() {
                             <i className="tji-arrow-right"></i>
                           </span>
                         </div>
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>

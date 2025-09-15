@@ -183,14 +183,12 @@
 
 .chat-msg.assistant blockquote {
   border-left: 3px solid #667eea;
-  padding-left: 1em;
   margin: 0.5em 0;
   font-style: italic;
   background: rgba(102, 126, 234, 0.1);
   padding: 0.5em 1em;
   border-radius: 0 5px 5px 0;
 }
-
 .chat-msg.assistant strong {
   font-weight: bold;
   color: #2c3e50;

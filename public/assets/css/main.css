@@ -4873,7 +4873,8 @@ START: Hero CSS
   max-width: 625px;
   margin-top: 65px;
   padding-top: 25px;
-  -webkit-margin-start: auto;
+    margin: 65px auto 0;
+    -webkit-margin-start: auto;
   margin-inline-start: auto;
   -webkit-padding-start: 27px;
   padding-inline-start: 27px;
@@ -10771,10 +10772,10 @@ START: Contact CSS
 
 .contact-form {
   background-color: var(--tj-color-theme-bg);
-  -webkit-margin-start: 0;
-  margin-inline-start: 0;
-  -webkit-margin-end: 15px;
-  margin-inline-end: 15px;
+  /*-webkit-margin-start: 0;*/
+  /*margin-inline-start: 0;*/
+  /*-webkit-margin-end: 15px;*/
+  /*margin-inline-end: 15px;*/
     width: 100%;
   padding: 1px 10px;
   border-radius: 12px;

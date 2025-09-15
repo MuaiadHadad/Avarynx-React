@@ -2,11 +2,12 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { connectToCorrectWebSocket } from '@/lib/websocket';
 import Header from '@/components/sections/Header';
 import Footer from '@/components/sections/Footer';
 import Main from '@/components/sections/Main';
+import LoginModal from '@/components/auth/LoginModal';
 
 type TalkingHeadLike = {
   audioCtx?: AudioContext & { state: 'running' | 'suspended'; resume: () => Promise<void> };
@@ -39,6 +40,8 @@ type TalkingHeadLike = {
 };
 
 export default function HomePage() {
+  const [loginOpen, setLoginOpen] = useState(false);
+
   useEffect(() => {
     const initializeAvatar = async () => {
       try {
@@ -526,11 +529,32 @@ export default function HomePage() {
     initializeAvatar();
   }, []);
 
+  const handleAuthSubmit = async (payload: {
+    mode: 'login' | 'register';
+    email: string;
+    password: string;
+    username?: string;
+  }) => {
+    // TODO: replace with real auth/register API call.
+    console.log('Auth submit', payload);
+    setLoginOpen(false);
+  };
+
+  const handleProvider = (provider: 'google' | 'microsoft' | 'linkedin') => {
+    // TODO: start OAuth flow for the provider
+    console.log('Auth provider', provider);
+    setLoginOpen(false);
+  };
   return (
     <>
-      <Header />
+      <Header onLoginClickAction={() => setLoginOpen(true)} />
       <Main />
       <Footer />
+      <LoginModal
+        open={loginOpen}
+        onCloseAction={() => setLoginOpen(false)}
+        onSubmitAction={handleAuthSubmit}
+      />
     </>
   );
 }
