@@ -6,130 +6,50 @@ import { useState, type ChangeEvent } from 'react';
 export default function Main() {
   const [isInputActive, setIsInputActive] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [started, setStarted] = useState(false);
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
 
-  const handleInputFocus = () => {
-    setIsInputActive(true);
-  };
+    // aqui colocas a tua lógica de envio da mensagem...
+    // sendMessage(inputValue);
 
-  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setInputValue(e.target.value);
-    if (e.target.value.length > 0) {
-      setIsInputActive(true);
-    }
-  };
-
-  const handleInputBlur = () => {
-    if (inputValue.length === 0) {
-      setIsInputActive(false);
-    }
-  };
+    setStarted(true); // mostra transcript e esconde o título
+    setInputValue(''); // opcional: limpar input
+  }
 
   return (
     <main id="primary" className="site-main">
       {/* Banner Section */}
       <section className="tj-banner-section-2">
         <div className="banner-area">
-          {/*<div className="banner-left-box" style={{ padding: '12px' }}>*/}
-          {/*  <form*/}
-          {/*    id="contact-form"*/}
-          {/*    className="contact-form"*/}
-          {/*    style={{ backgroundColor: 'transparent' }}*/}
-          {/*    onSubmit={(e) => e.preventDefault()}*/}
-          {/*  >*/}
-          {/*    <div*/}
-          {/*      id="chat-transcript"*/}
-          {/*      className="chat-transcript"*/}
-          {/*      aria-live="polite"*/}
-          {/*      aria-label="Chat transcript"*/}
-          {/*    ></div>*/}
-          {/*    <div className="col-sm-12">*/}
-          {/*      <div*/}
-          {/*        className="form-input message-input"*/}
-          {/*        style={{*/}
-          {/*          backgroundColor: isInputActive ? 'transparent' : '#f9f9f9',*/}
-          {/*          borderRadius: '25px',*/}
-          {/*          border: isInputActive ? '2px solid #ccc' : '1px solid #e0e0e0',*/}
-          {/*          transition: 'all 0.3s ease',*/}
-          {/*          boxShadow: isInputActive*/}
-          {/*            ? '0 2px 8px rgba(0,0,0,0.1)'*/}
-          {/*            : '0 1px 3px rgba(0,0,0,0.05)',*/}
-          {/*          position: 'relative',*/}
-          {/*        }}*/}
-          {/*      >*/}
-          {/*        {!isInputActive && inputValue.length === 0 && (*/}
-          {/*          <div*/}
-          {/*            style={{*/}
-          {/*              position: 'absolute',*/}
-          {/*              top: '50%',*/}
-          {/*              left: '20px',*/}
-          {/*              transform: 'translateY(-50%)',*/}
-          {/*              color: '#666',*/}
-          {/*              fontSize: '14px',*/}
-          {/*              pointerEvents: 'none',*/}
-          {/*              zIndex: 1,*/}
-          {/*            }}*/}
-          {/*          >*/}
-          {/*            Olá! Como posso ajudar hoje?*/}
-          {/*          </div>*/}
-          {/*        )}*/}
-          {/*        <textarea*/}
-          {/*          name="cfMessage"*/}
-          {/*          id="message"*/}
-          {/*          rows={1}*/}
-          {/*          aria-label="Message"*/}
-          {/*          placeholder={isInputActive ? 'Talk with me..' : ''}*/}
-          {/*          value={inputValue}*/}
-          {/*          onChange={handleInputChange}*/}
-          {/*          onFocus={handleInputFocus}*/}
-          {/*          onBlur={handleInputBlur}*/}
-          {/*          style={{*/}
-          {/*            borderRadius: '25px',*/}
-          {/*            border: 'none',*/}
-          {/*            outline: 'none',*/}
-          {/*            padding: '2px 60px 15px 20px',*/}
-          {/*            backgroundColor: 'transparent',*/}
-          {/*            position: 'relative',*/}
-          {/*            zIndex: 2,*/}
-          {/*            resize: 'none',*/}
-          {/*          }}*/}
-          {/*        ></textarea>*/}
-          {/*        <button*/}
-          {/*          className="tj-primary-btn submit-inside"*/}
-          {/*          type="submit"*/}
-          {/*          aria-label="Send message"*/}
-          {/*          style={{*/}
-          {/*            backgroundColor: 'transparent',*/}
-          {/*            borderRadius: '100%',*/}
-          {/*            transition: 'none',*/}
-          {/*            animation: 'none',*/}
-          {/*            opacity: isInputActive && inputValue.length > 0 ? 1 : 0.5,*/}
-          {/*          }}*/}
-          {/*        >*/}
-          {/*          <i className="tji-plane"></i>*/}
-          {/*        </button>*/}
-          {/*      </div>*/}
-          {/*    </div>*/}
-          {/*  </form>*/}
-          {/*  <div className="banner-shape">*/}
-          {/*    <img src="/assets/images/shape/pattern-bg.svg" alt="" />*/}
-          {/*  </div>*/}
-          {/*</div>*/}
           <div className="banner-left-box" style={{ padding: '12px' }}>
+            <div
+              id="chat-transcript"
+              className={`chat-transcript ${started ? '' : 'is-hidden'}`}
+              role="log"
+              aria-live="polite"
+              aria-label="Chat transcript"
+              style={{ width: '100%', backgroundColor: 'transparent' }}
+            />
             <div className="left-hero">
-              <div
-                id="chat-transcript"
-                className="chat-transcript"
-                role="log"
-                aria-live="polite"
-                aria-label="Chat transcript"
-              />
               {/* Título */}
-              <h1 className="hero-title">What’s on your mind today?</h1>
+              {/* Título — só visível antes do primeiro envio */}
+              {!started && ( // NEW
+                <h1 className="hero-title" aria-hidden={started}>
+                  What’s on your mind today?
+                </h1>
+              )}
               {/* Barra de input */}
               <form
                 id="contact-form"
                 className="contact-form"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!inputValue.trim()) return;
+                  setStarted(true);
+                  // ... envia a mensagem
+                }}
                 style={{ backgroundColor: 'transparent' }}
               >
                 <div className={`query-bar ${isInputActive ? 'active' : ''}`}>
@@ -209,21 +129,6 @@ export default function Main() {
                 <div id="avatar-loading-value"></div>
               </div>
             </div>
-
-            {/*/!* Google Ad slot *!/*/}
-            {/*<div className="ad-slot">*/}
-            {/*  <ins*/}
-            {/*    className="adsbygoogle"*/}
-            {/*    style={{ display: 'block' }}*/}
-            {/*    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"*/}
-            {/*    data-ad-slot="0000000000"*/}
-            {/*    data-ad-format="auto"*/}
-            {/*    data-full-width-responsive="true"*/}
-            {/*  ></ins>*/}
-            {/*  <noscript>*/}
-            {/*    <div className="ad-placeholder">Google Ad (enable JavaScript to display)</div>*/}
-            {/*  </noscript>*/}
-            {/*</div>*/}
           </div>
         </div>
       </section>

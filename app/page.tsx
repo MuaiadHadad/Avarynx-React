@@ -9,6 +9,25 @@ import Footer from '@/components/sections/Footer';
 import Main from '@/components/sections/Main';
 import LoginModal from '@/components/auth/LoginModal';
 
+declare global {
+  interface Window {
+    THREE?: any;
+    TalkingHead?: any;
+    avatarRenderer?: any;
+    talkingHead?: () => TalkingHeadLike | null;
+    avatarSample?: {
+      greet: () => void;
+      demo: () => void;
+      goodbye: () => void;
+    };
+  }
+  // Eventos custom do loader do TalkingHead
+  interface WindowEventMap {
+    'talkinghead-loaded': Event;
+    'talkinghead-error': Event;
+  }
+}
+
 type TalkingHeadLike = {
   audioCtx?: AudioContext & { state: 'running' | 'suspended'; resume: () => Promise<void> };
   speakAudio?: (args: {
@@ -45,6 +64,7 @@ export default function HomePage() {
   useEffect(() => {
     const initializeAvatar = async () => {
       try {
+        // Espera por THREE/importmap
         await new Promise((resolve) => {
           if (window.THREE || document.querySelector('script[type="importmap"]')) {
             resolve(true);
@@ -60,6 +80,7 @@ export default function HomePage() {
           }
         });
 
+        // Carrega TalkingHead como módulo
         const script = document.createElement('script');
         script.type = 'module';
         script.textContent = `
@@ -75,10 +96,12 @@ export default function HomePage() {
         `;
         document.head.appendChild(script);
 
+        // Aguarda sucesso/falha
         await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error('TalkingHead module loading timeout'));
-          }, 10000);
+          const timeout = setTimeout(
+            () => reject(new Error('TalkingHead module loading timeout')),
+            10000,
+          );
 
           window.addEventListener(
             'talkinghead-loaded',
@@ -99,7 +122,7 @@ export default function HomePage() {
           );
         });
 
-        // Initialize variables exactly as in original
+        // ------- Estado & buffers -------
         let talkingHead: TalkingHeadLike | null = null;
         const currentMood = 'neutral';
         let avatarInitialized = false;
@@ -111,6 +134,7 @@ export default function HomePage() {
         let reconnectAttempts = 0;
         const maxReconnectAttempts = 5;
 
+        // ------- Helpers -------
         async function addChatMessage(role: 'user' | 'assistant', content: string) {
           try {
             const transcript = document.getElementById('chat-transcript');
@@ -147,6 +171,44 @@ export default function HomePage() {
           el.style.display = visible ? 'flex' : 'none';
         }
 
+        async function decodeBase64ToAudioBuffer(b64: string): Promise<AudioBuffer> {
+          if (!talkingHead?.audioCtx) throw new Error('No AudioContext');
+          const bstr = atob(b64);
+          const bytes = new Uint8Array(bstr.length);
+          for (let i = 0; i < bstr.length; i++) bytes[i] = bstr.charCodeAt(i);
+          return await talkingHead.audioCtx.decodeAudioData(bytes.buffer);
+        }
+
+        function buildWordTimingsFromText(text: string, totalMs: number) {
+          const words = (text || '').trim().split(/\s+/).filter(Boolean);
+          if (!words.length) return { words: [], wtimes: [], wdurations: [] as number[] };
+
+          const gaps = Math.max(0, words.length - 1);
+          const GAP_MS = 60;
+          const available = Math.max(100, totalMs - gaps * GAP_MS);
+          const weights = words.map((w) => Math.max(1, w.replace(/[^\p{L}\p{N}]/gu, '').length));
+          const sum = weights.reduce((a, b) => a + b, 0) || 1;
+          const unit = available / sum;
+
+          const wdurations = weights.map((w) => Math.max(80, Math.round(w * unit)));
+          const durSum = wdurations.reduce((a, b) => a + b, 0) + gaps * GAP_MS;
+          if (durSum > totalMs) {
+            const scale = (totalMs - gaps * GAP_MS) / (durSum - gaps * GAP_MS);
+            for (let i = 0; i < wdurations.length; i++)
+              wdurations[i] = Math.max(60, Math.round(wdurations[i] * scale));
+          }
+
+          const wtimes: number[] = [];
+          let t = 0;
+          for (let i = 0; i < words.length; i++) {
+            wtimes.push(t);
+            t += wdurations[i];
+            if (i < words.length - 1) t += GAP_MS;
+          }
+          return { words, wtimes, wdurations };
+        }
+
+        // ------- WebSocket -------
         async function initSocketConnection() {
           try {
             socket = await connectToCorrectWebSocket();
@@ -174,6 +236,7 @@ export default function HomePage() {
             });
 
             socket.addEventListener('message', async (event) => {
+              // Lida com string ou binário inesperado
               let data: unknown = null;
               try {
                 data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
@@ -189,10 +252,10 @@ export default function HomePage() {
                 const obj =
                   data && typeof data === 'object' ? (data as Record<string, unknown>) : null;
 
+                // Mensagem “livre” sem step — mantém compat
                 if (obj && !('step' in obj)) {
-                  const text =
-                    obj && typeof (obj as any).text === 'string' ? (obj as any).text : '';
-                  const audio = obj ? (obj as any).audio : undefined;
+                  const text = typeof (obj as any).text === 'string' ? (obj as any).text : '';
+                  const audio = (obj as any).audio;
                   if (text) {
                     await addChatMessage('assistant', text);
                     messageHistory.push({ role: 'assistant', content: text });
@@ -202,14 +265,9 @@ export default function HomePage() {
                       if (talkingHead.audioCtx && talkingHead.audioCtx.state === 'suspended') {
                         try {
                           await talkingHead.audioCtx.resume();
-                        } catch (e) {
-                          console.warn('AudioContext resume failed', e);
-                        }
+                        } catch {}
                       }
-                      const bstr = atob(audio as string);
-                      const bytes = new Uint8Array(bstr.length);
-                      for (let i = 0; i < bstr.length; i++) bytes[i] = bstr.charCodeAt(i);
-                      const audioBuffer = await talkingHead.audioCtx!.decodeAudioData(bytes.buffer);
+                      const audioBuffer = await decodeBase64ToAudioBuffer(String(audio));
                       setTranscriptVisible(true);
                       talkingHead.speakAudio?.({ audio: audioBuffer });
                     } catch (e) {
@@ -219,7 +277,7 @@ export default function HomePage() {
                   return;
                 }
 
-                const step = (obj as any)?.step;
+                const step = (obj as any)?.step as string | undefined;
                 const response = (obj as any)?.response;
                 const audio = (obj as any)?.audio;
                 const requestId = (obj as any)?.request_id as string | undefined;
@@ -236,6 +294,63 @@ export default function HomePage() {
                     if (el) el.textContent = 'Speech recognized';
                     break;
                   }
+
+                  // NOVO: servidor envia ambos de uma vez
+                  case 'llm/tts': {
+                    const text = typeof response === 'string' ? response : response?.text || '';
+                    if (requestId && typeof text === 'string') llmTextByRequestId[requestId] = text;
+
+                    if (text) {
+                      await addChatMessage('assistant', text);
+                      messageHistory.push({ role: 'assistant', content: text });
+                    }
+
+                    if (audio && talkingHead && avatarInitialized) {
+                      try {
+                        if (talkingHead.audioCtx && talkingHead.audioCtx.state === 'suspended') {
+                          try {
+                            await talkingHead.audioCtx.resume();
+                          } catch {}
+                        }
+                        const audioBuffer = await decodeBase64ToAudioBuffer(String(audio));
+                        const totalMs = Math.max(200, Math.round(audioBuffer.duration * 1000));
+
+                        // Usa o texto recebido (por requestId ou o próprio text)
+                        const llmText = (requestId && llmTextByRequestId[requestId]) || text || '';
+
+                        // Limpa cache por requestId
+                        if (requestId) delete llmTextByRequestId[requestId];
+
+                        const { words, wtimes, wdurations } = buildWordTimingsFromText(
+                          llmText,
+                          totalMs,
+                        );
+
+                        setTranscriptVisible(true);
+                        if (words.length) {
+                          talkingHead.speakAudio?.({
+                            audio: audioBuffer,
+                            words,
+                            wtimes,
+                            wdurations,
+                          });
+                        } else {
+                          talkingHead.speakAudio?.({ audio: audioBuffer });
+                        }
+
+                        const el = document.getElementById('avatar-loading-value');
+                        if (el) el.textContent = 'Ready';
+                        setTimeout(() => setTranscriptVisible(false), totalMs + 300);
+                      } catch (e) {
+                        console.error('Error processing llm/tts audio:', e);
+                        const el = document.getElementById('avatar-loading-value');
+                        if (el) el.textContent = 'Error processing audio';
+                      }
+                    }
+                    break;
+                  }
+
+                  // Mantém compat com servidores antigos que enviem em 2 passos
                   case 'llm': {
                     const text = typeof response === 'string' ? response : response?.text || '';
                     const el = document.getElementById('avatar-loading-value');
@@ -253,60 +368,33 @@ export default function HomePage() {
                         if (talkingHead.audioCtx && talkingHead.audioCtx.state === 'suspended') {
                           try {
                             await talkingHead.audioCtx.resume();
-                          } catch (e) {
-                            console.warn('AudioContext resume failed', e);
-                          }
+                          } catch {}
                         }
-                        const bstr = atob(audio as string);
-                        const bytes = new Uint8Array(bstr.length);
-                        for (let i = 0; i < bstr.length; i++) bytes[i] = bstr.charCodeAt(i);
-                        const audioBuffer = await talkingHead.audioCtx!.decodeAudioData(
-                          bytes.buffer,
-                        );
+                        const audioBuffer = await decodeBase64ToAudioBuffer(String(audio));
 
                         const llmText = requestId ? llmTextByRequestId[requestId] : undefined;
                         if (requestId) delete llmTextByRequestId[requestId];
 
                         const totalMs = Math.max(200, Math.round(audioBuffer.duration * 1000));
-                        const words = (llmText || '').trim().split(/\s+/).filter(Boolean);
+                        const { words, wtimes, wdurations } = llmText
+                          ? buildWordTimingsFromText(llmText, totalMs)
+                          : { words: [], wtimes: [], wdurations: [] as number[] };
+
+                        setTranscriptVisible(true);
                         if (words.length) {
-                          const gaps = Math.max(0, words.length - 1);
-                          const GAP_MS = 60;
-                          const available = Math.max(100, totalMs - gaps * GAP_MS);
-                          const weights = words.map((w) =>
-                            Math.max(1, w.replace(/[^\p{L}\p{N}]/gu, '').length),
-                          );
-                          const sum = weights.reduce((a, b) => a + b, 0) || 1;
-                          const unit = available / sum;
-                          const wdurations = weights.map((w) => Math.max(80, Math.round(w * unit)));
-                          const durSum = wdurations.reduce((a, b) => a + b, 0) + gaps * GAP_MS;
-                          if (durSum > totalMs) {
-                            const scale = (totalMs - gaps * GAP_MS) / (durSum - gaps * GAP_MS);
-                            for (let i = 0; i < wdurations.length; i++)
-                              wdurations[i] = Math.max(60, Math.round(wdurations[i] * scale));
-                          }
-                          const wtimes: number[] = [];
-                          let t = 0;
-                          for (let i = 0; i < words.length; i++) {
-                            wtimes.push(t);
-                            t += wdurations[i];
-                            if (i < words.length - 1) t += GAP_MS;
-                          }
-                          setTranscriptVisible(true);
                           talkingHead.speakAudio?.({
                             audio: audioBuffer,
                             words,
                             wtimes,
                             wdurations,
                           });
-                          setTimeout(() => setTranscriptVisible(false), totalMs + 300);
                         } else {
-                          setTranscriptVisible(true);
                           talkingHead.speakAudio?.({ audio: audioBuffer });
-                          setTimeout(() => setTranscriptVisible(false), totalMs + 300);
                         }
+
                         const el = document.getElementById('avatar-loading-value');
                         if (el) el.textContent = 'Ready';
+                        setTimeout(() => setTranscriptVisible(false), totalMs + 300);
                       } catch (e) {
                         console.error('Error processing TTS audio:', e);
                         const el = document.getElementById('avatar-loading-value');
@@ -315,6 +403,7 @@ export default function HomePage() {
                     }
                     break;
                   }
+
                   default: {
                     if ((obj as any)?.text) {
                       await addChatMessage('assistant', (obj as any).text);
@@ -335,6 +424,7 @@ export default function HomePage() {
           }
         }
 
+        // ------- Avatar -------
         async function initAvatar() {
           try {
             const avatarDisplay = document.getElementById('avatar-display') as HTMLElement | null;
@@ -356,7 +446,7 @@ export default function HomePage() {
               return;
             }
 
-            talkingHead = new (window as any).TalkingHead(avatarDisplay, {
+            const talkingHeadInstance = new window.TalkingHead(avatarDisplay, {
               ttsEndpoint: 'https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=',
               lipsyncModules: ['en'],
               cameraView: 'head',
@@ -367,6 +457,7 @@ export default function HomePage() {
               audioContext: null,
               useStrictAudioContext: false,
             }) as TalkingHeadLike;
+            talkingHead = talkingHeadInstance;
 
             await talkingHead.showAvatar?.({
               url: '/avatars/brunette.glb',
@@ -377,9 +468,7 @@ export default function HomePage() {
 
             try {
               const r =
-                talkingHead?.renderer ||
-                talkingHead?.three?.renderer ||
-                (window as any).avatarRenderer;
+                talkingHead?.renderer || talkingHead?.three?.renderer || window.avatarRenderer;
               (r as any)?.setClearColor?.(0x000000, 0);
               (r as any)?.setClearAlpha?.(0);
             } catch (e) {
@@ -387,13 +476,8 @@ export default function HomePage() {
             }
 
             const cvs = avatarDisplay.querySelector('canvas') as HTMLCanvasElement | null;
-            if (cvs) {
-              cvs.style.background = 'transparent';
-            }
-
-            if (avatarVideo) {
-              avatarVideo.style.display = 'none';
-            }
+            if (cvs) cvs.style.background = 'transparent';
+            if (avatarVideo) avatarVideo.style.display = 'none';
 
             if (loadingValue)
               loadingValue.textContent = 'Avatar ready! Click controls to interact.';
@@ -415,12 +499,10 @@ export default function HomePage() {
 
         async function speakText(text: string) {
           if (!talkingHead || !avatarInitialized) return;
-
           try {
             if (talkingHead.audioCtx && talkingHead.audioCtx.state === 'suspended') {
               await talkingHead.audioCtx.resume();
             }
-
             await talkingHead.speakText?.(text, {
               onStart: () => {
                 const lv = document.getElementById('avatar-loading-value') as HTMLElement | null;
@@ -452,12 +534,9 @@ export default function HomePage() {
               textarea.value = '';
 
               try {
-                if (
-                  talkingHead &&
-                  talkingHead.audioCtx &&
-                  talkingHead.audioCtx.state === 'suspended'
-                )
+                if (talkingHead?.audioCtx?.state === 'suspended') {
                   await talkingHead.audioCtx.resume();
+                }
               } catch {}
 
               const lv = document.getElementById('avatar-loading-value') as HTMLElement | null;
@@ -468,11 +547,8 @@ export default function HomePage() {
             textarea.addEventListener('keydown', (e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                if (typeof form.requestSubmit === 'function') {
-                  form.requestSubmit();
-                } else {
-                  form.submit();
-                }
+                if (typeof form.requestSubmit === 'function') form.requestSubmit();
+                else form.submit();
               }
             });
           }
@@ -480,15 +556,13 @@ export default function HomePage() {
 
         function sendMessageToServer(message: string) {
           if (!socket || socket.readyState !== WebSocket.OPEN) {
-            alert(
-              'Not connected to server. Please check if the Python server is running on 192.168.1.99:7200',
-            );
+            alert('Not connected to server. Please check if the server is running.');
             return;
           }
 
           const requestData = {
             request_id: Date.now().toString(),
-            expert: { area: 'health', voice: 'alloy' },
+            expert: { area: 'job', voice: 'alloy' },
             user_details: {
               name: 'Muaiad',
               gender: 'male',
@@ -509,10 +583,13 @@ export default function HomePage() {
           }
         }
 
+        // Boot
         setupUI();
         initSocketConnection();
         setTimeout(initAvatar, 2000);
-        (window as any).avatarSample = {
+
+        // Helpers de debug no window
+        window.avatarSample = {
           greet: () => speakText("Hello! I'm your AI avatar assistant. How can I help you today?"),
           demo: () =>
             speakText(
@@ -520,7 +597,7 @@ export default function HomePage() {
             ),
           goodbye: () => speakText('Thank you for trying out the AI avatar. Have a great day!'),
         };
-        (window as any).talkingHead = () => talkingHead;
+        window.talkingHead = () => talkingHead;
       } catch (error) {
         console.error('Failed to initialize avatar:', error);
       }
@@ -535,16 +612,17 @@ export default function HomePage() {
     password: string;
     username?: string;
   }) => {
-    // TODO: replace with real auth/register API call.
+    // TODO: trocar por API real
     console.log('Auth submit', payload);
     setLoginOpen(false);
   };
 
   const handleProvider = (provider: 'google' | 'microsoft' | 'linkedin') => {
-    // TODO: start OAuth flow for the provider
+    // TODO: iniciar fluxo OAuth
     console.log('Auth provider', provider);
     setLoginOpen(false);
   };
+
   return (
     <>
       <Header onLoginClickAction={() => setLoginOpen(true)} />
@@ -554,6 +632,7 @@ export default function HomePage() {
         open={loginOpen}
         onCloseAction={() => setLoginOpen(false)}
         onSubmitAction={handleAuthSubmit}
+        onProviderAction={handleProvider}
       />
     </>
   );

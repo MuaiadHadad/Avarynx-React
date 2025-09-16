@@ -270,7 +270,7 @@
     border-radius: 9999px;
     padding: 14px 12px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-    backdrop-filter: saturate(120%) blur(6px);
+    /*backdrop-filter: saturate(120%) blur(6px);*/
 }
 
 .query-bar.active {
@@ -367,5 +367,9 @@
 
 /* Backdrop com blur */
 .custom-blur-backdrop {
-    backdrop-filter: blur(6px);
+    /*backdrop-filter: blur(6px);*/
 }
+.chat-transcript.is-hidden {
+    display: none !important;
+}
+
