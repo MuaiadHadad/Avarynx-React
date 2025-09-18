@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-/* eslint-disable prettier/prettier */
 'use client';
 
 import Link from 'next/link';
@@ -89,7 +88,7 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                               className={`w-2 h-2 rounded-full ${verified ? 'bg-emerald-400' : 'bg-amber-400'} animate-pulse`}
                               aria-hidden="true"
                             />
-                            {verified ? 'Verificado' : 'Não verificado'}
+                            {verified ? 'verified' : 'Not verified'}
                           </span>
                         </div>
 
@@ -102,7 +101,7 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                           aria-expanded={menuOpen}
                           className="relative outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-full group"
                         >
-                          <span className="sr-only">Abrir menu do utilizador</span>
+                          <span className="sr-only">Open user menu</span>
                           <div
                             className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-lg select-none
                                        bg-gradient-to-br from-primary-600 to-primary-700 ring-2 ring-primary-600/50 ring-offset-2 ring-offset-[#202020]
@@ -124,12 +123,14 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                         <button
                           type="button"
                           onClick={logout}
-                          className="hidden xl:inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-primary-600/40
-                                     bg-[#202020] text-white hover:bg-primary-700/25 hover:border-primary-500/60 transition-colors
-                                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                           aria-label="Terminar sessão"
+                          className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                         >
-                          Sair
+                          <div className="btn-inner">
+                            <span className="btn-icon h-icon"><i className="tji-arrow-right" /></span>
+                            <span className="btn-text">Logout</span>
+                            <span className="btn-icon"><i className="tji-arrow-right" /></span>
+                          </div>
                         </button>
 
                         {/* Dropdown */}
@@ -138,7 +139,7 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                             ref={menuRef}
                             role="menu"
                             aria-label="Menu do utilizador"
-                            className="absolute right-0 top-full mt-3 w-64 rounded-lg border border-primary-600/30 bg-[#202020]/95 backdrop-blur-sm
+                            className="absolute right-0 top-full mt-3 w-64 rounded-lg border border-primary-600/30 bg-[#26204CFF]/95 backdrop-blur-sm
                                        shadow-xl shadow-black/40 p-4 animate-fade-in z-50"
                           >
                             <div className="flex items-center gap-3 pb-3 mb-3 border-b border-primary-600/20">
@@ -160,7 +161,7 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                                     className={`w-2 h-2 rounded-full ${verified ? 'bg-emerald-400' : 'bg-amber-400'}`}
                                     aria-hidden="true"
                                   />
-                                  {verified ? 'Email verificado' : 'Email não verificado'}
+                                  {verified ? 'Email verified' : 'Email not verified'}
                                 </span>
                               </li>
                               <li role="none">
@@ -171,7 +172,7 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                                   className="w-full text-left px-3 py-2 rounded-md bg-red-600/10 hover:bg-red-600/20 text-red-300 hover:text-red-200
                                              transition-colors text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                                 >
-                                  Terminar sessão
+                                 Logout
                                 </button>
                               </li>
                             </ul>

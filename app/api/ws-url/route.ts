@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
  *
  * Environment Variables:
  * - MODEL_PROVIDER: Determines which AI provider to use ('local' | 'openai')
- * - WEBSOCKET_HOST: External server host (e.g., '192.168.1.99:7200')
+ * - WEBSOCKET_HOST: External server host (e.g., 'frontend.avarynx.mywire.org')
  *
  * Returns:
  * - ws_url: Relative WebSocket path
@@ -23,8 +23,8 @@ const settings = {
   model_provider: process.env.MODEL_PROVIDER || 'local',
 
   // WebSocket server host - supports external servers
-  // Default points to your Python AI server at 192.168.1.99:7200
-  server_host: process.env.WEBSOCKET_HOST || '192.168.1.99:7200',
+  // Default points to your production server at frontend.avarynx.mywire.org
+  server_host: process.env.WEBSOCKET_HOST || 'frontend.avarynx.mywire.org',
 };
 
 /**
@@ -57,8 +57,9 @@ export async function GET() {
   }
 
   // Construct the complete WebSocket URL
-  // Uses 'ws://' protocol for HTTP and 'wss://' for HTTPS
-  const fullUrl = `ws://${settings.server_host}${wsPath}`;
+  // Uses 'wss://' protocol for HTTPS and 'ws://' for HTTP
+  const protocol = settings.server_host.includes('avarynx.mywire.org') ? 'wss://' : 'ws://';
+  const fullUrl = `${protocol}${settings.server_host}${wsPath}`;
 
   // Log configuration for debugging
   console.log(`🔧 WebSocket Configuration:
@@ -72,7 +73,7 @@ export async function GET() {
     // Relative path - used for dynamic URL construction
     ws_url: wsPath,
 
-    // Complete URL - used for external server connections (like 192.168.1.99:7200)
+    // Complete URL - used for external server connections (like frontend.avarynx.mywire.org)
     full_ws_url: fullUrl,
 
     // Host information - useful for debugging and display

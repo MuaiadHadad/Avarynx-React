@@ -41,7 +41,7 @@ pnpm dev
 # or: yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [https://frontend.avarynx.mywire.org](https://frontend.avarynx.mywire.org) in your browser.
 
 ## 🔧 Configuration
 

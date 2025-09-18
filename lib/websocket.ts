@@ -16,7 +16,7 @@ export async function connectToCorrectWebSocket(): Promise<WebSocket> {
     const res = await fetch('/api/ws-url');
     const data = await res.json();
 
-    // Use the full URL if provided (for external servers like 192.168.1.99:7200)
+    // Use the full URL if provided (for external servers like frontend.avarynx.mywire.org)
     // Otherwise build it dynamically for local connections
     const wsUrl =
       data.full_ws_url ||
