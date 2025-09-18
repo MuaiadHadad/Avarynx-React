@@ -422,7 +422,7 @@ export default function LoginModal({
                             className="text-decoration-none"
                             style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.65)' }}
                           >
-                            Esqueceste a palavra‑passe?
+                            Forgot password?
                           </Link>
                         </div>
                       )}

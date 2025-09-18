@@ -1,11 +1,11 @@
 'use client';
 /*
  * /auth/reset-password
- * Página para introduzir nova palavra‑passe a partir de um token de redefinição.
- * Fluxo:
- *  - Se token vier via query (?token=...), mostra diretamente formulário.
- *  - Caso contrário, pede token primeiro.
- *  - Envia POST AuthAPI.resetPassword.
+ * Page to enter a new password from a reset token.
+ * Flow:
+ *  - If token comes via query (?token=...), shows form directly.
+ *  - Otherwise, asks for token first.
+ *  - Sends POST AuthAPI.resetPassword.
  */
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -75,11 +75,11 @@ export default function ResetPasswordPage() {
     try {
       await AuthAPI.resetPassword({ token: token.trim(), password });
       setDone(true);
-      // Limpa dados sensíveis
+      // Clear sensitive data
       setPassword('');
       setConfirm('');
     } catch (err: any) {
-      setError(err?.message || 'Falha ao redefinir a palavra‑passe.');
+      setError(err?.message || 'Failed to reset password.');
     } finally {
       setSubmitting(false);
     }
@@ -114,10 +114,10 @@ export default function ResetPasswordPage() {
             }}
           >
             <h1 style={{ fontSize: '1.35rem', margin: '0 0 .75rem', fontWeight: 600 }}>
-              Introduz o token
+              Enter your reset token
             </h1>
             <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.5, margin: '0 0 1.1rem' }}>
-              Cola aqui o token enviado no email de redefinição de palavra‑passe.
+              Paste here the token you received in the password reset email.
             </p>
             <form
               onSubmit={(e) => {
@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 rows={3}
-                placeholder="Token de redefinição"
+                placeholder="Reset token"
                 style={{
                   width: '100%',
                   background: 'rgba(255,255,255,0.06)',
@@ -153,7 +153,7 @@ export default function ResetPasswordPage() {
                 disabled={!token.trim()}
               >
                 <div className="btn-inner">
-                  <span className="btn-text">Continuar</span>
+                  <span className="btn-text">Continue</span>
                   <span className="btn-icon">
                     <i className="tji-arrow-right" />
                   </span>
@@ -162,7 +162,7 @@ export default function ResetPasswordPage() {
             </form>
             <div style={{ marginTop: 24 }}>
               <Link href="/auth/forgot-password" style={{ color: '#9ca3af', fontSize: 12 }}>
-                Não tens um token? Solicitar novo link
+                Need a token? Request a new link
               </Link>
             </div>
           </div>
@@ -211,10 +211,10 @@ export default function ResetPasswordPage() {
             }}
           />
           <h1 style={{ fontSize: '1.35rem', margin: '0 0 .75rem', fontWeight: 600 }}>
-            Redefinir palavra‑passe
+            Reset password
           </h1>
           <p style={{ fontSize: 14, lineHeight: 1.5, opacity: 0.85, margin: '0 0 1.1rem' }}>
-            Escolhe uma nova palavra‑passe segura para a tua conta.
+            Choose a new secure password for your account.
           </p>
 
           {!done && (
@@ -224,7 +224,7 @@ export default function ResetPasswordPage() {
                   htmlFor="new-password"
                   style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6 }}
                 >
-                  Nova palavra‑passe
+                  New password
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -262,14 +262,14 @@ export default function ResetPasswordPage() {
                       borderRadius: 8,
                       cursor: 'pointer',
                     }}
-                    aria-label={showPassword ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe'}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? 'Ocultar' : 'Mostrar'}
+                    {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
                 <PasswordStrength value={password} />
                 <p style={{ fontSize: 12, opacity: 0.65, margin: '6px 0 0' }}>
-                  Min. 8 chars, 1 maiúscula, 1 número. Recomenda-se caractere especial.
+                  Min. 8 chars, 1 uppercase, 1 number. Special character recommended.
                 </p>
               </div>
               <div style={{ marginBottom: '1rem' }}>
@@ -277,7 +277,7 @@ export default function ResetPasswordPage() {
                   htmlFor="confirm-password"
                   style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6 }}
                 >
-                  Confirmar palavra‑passe
+                  Confirm password
                 </label>
                 <input
                   id="confirm-password"
@@ -300,7 +300,7 @@ export default function ResetPasswordPage() {
                 />
                 {mismatch && (
                   <div style={{ fontSize: 12, color: '#f87171', marginTop: 4 }}>
-                    As palavras‑passe não coincidem.
+                    Passwords do not match.
                   </div>
                 )}
               </div>
@@ -327,7 +327,7 @@ export default function ResetPasswordPage() {
               >
                 <div className="btn-inner">
                   <span className="btn-text">
-                    {submitting ? 'A guardar…' : 'Guardar nova palavra‑passe'}
+                    {submitting ? 'Saving…' : 'Save new password'}
                   </span>
                   <span className="btn-icon">
                     <i className="tji-arrow-right" />
@@ -340,8 +340,7 @@ export default function ResetPasswordPage() {
           {done && (
             <div style={{ fontSize: 14, lineHeight: 1.55 }}>
               <p style={{ marginTop: 0 }}>
-                Palavra‑passe redefinida com sucesso. Já podes iniciar sessão com a nova
-                palavra‑passe.
+                Password successfully reset. You can now sign in with your new password.
               </p>
               <div style={{ display: 'flex', gap: 12, marginTop: 22 }}>
                 <Link
@@ -350,18 +349,18 @@ export default function ResetPasswordPage() {
                   style={{ textDecoration: 'none', flex: 1, textAlign: 'center' }}
                 >
                   <div className="btn-inner">
-                    <span className="btn-text">Ir para Home</span>
+                    <span className="btn-text">Go Home</span>
                     <span className="btn-icon">
                       <i className="tji-arrow-right" />
                     </span>
                   </div>
                 </Link>
                 <Link
-                  href="/" // você pode posteriormente abrir modal de login via query param/estado global
+                  href="/"
                   className="btn btn-outline-light"
                   style={{ flex: '0 0 auto', whiteSpace: 'nowrap', borderRadius: 14 }}
                 >
-                  Iniciar sessão
+                  Sign in
                 </Link>
               </div>
             </div>
@@ -376,7 +375,7 @@ export default function ResetPasswordPage() {
                 textDecoration: 'none',
               }}
             >
-              Precisas de um novo token? Pedir novamente
+              Need a new token? Request again
             </Link>
           </div>
         </div>
@@ -387,4 +386,3 @@ export default function ResetPasswordPage() {
     </main>
   );
 }
-

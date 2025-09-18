@@ -1,8 +1,8 @@
 'use client';
 /*
  * /auth/forgot-password
- * Página para solicitar link de redefinição de palavra‑passe.
- * Integra com AuthAPI.forgotPassword e mantém mensagem genérica de sucesso por segurança.
+ * Page to request password reset link.
+ * Integrates with AuthAPI.forgotPassword and keeps a generic success message for security.
  */
 import { useState } from 'react';
 import AuthAPI from '@/lib/auth/api';
@@ -21,14 +21,14 @@ export default function ForgotPasswordPage() {
     setError(null);
     try {
       await AuthAPI.forgotPassword(email.trim());
-      // Sempre mostrar mensagem genérica
+      // Always show generic message
       setDone(true);
     } catch (err: any) {
-      // Mesmo em caso de erro, não expor se email existe
-      // Mas podemos logar console em dev
+      // Even in case of error, do not expose if email exists
+      // But we can log to console in dev
       if (process.env.NODE_ENV !== 'production') {
         // eslint-disable-next-line no-console
-        console.warn('[forgot-password] erro:', err?.message);
+        console.warn('[forgot-password] error:', err?.message);
       }
       setDone(true);
     } finally {
@@ -73,11 +73,10 @@ export default function ForgotPasswordPage() {
             }}
           />
           <h1 style={{ fontSize: '1.35rem', margin: '0 0 .75rem', fontWeight: 600 }}>
-            Esqueci a palavra‑passe
+            Forgot your password
           </h1>
           <p style={{ fontSize: 14, lineHeight: 1.5, opacity: 0.85, margin: '0 0 1.25rem' }}>
-            Introduz o teu email e enviaremos um link para redefinir a tua palavra‑passe se existir
-            uma conta associada.
+            Enter your email and we will send a password reset link if an account exists for it.
           </p>
 
           {!done && (
@@ -95,7 +94,7 @@ export default function ForgotPasswordPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="voce@exemplo.com"
+                placeholder="you@example.com"
                 style={{
                   width: '100%',
                   background: 'rgba(255,255,255,0.06)',
@@ -134,7 +133,7 @@ export default function ForgotPasswordPage() {
               >
                 <div className="btn-inner">
                   <span className="btn-text">
-                    {submitting ? 'A enviar…' : 'Enviar link de redefinição'}
+                    {submitting ? 'Sending…' : 'Send reset link'}
                   </span>
                   <span className="btn-icon">
                     <i className="tji-arrow-right" />
@@ -147,10 +146,10 @@ export default function ForgotPasswordPage() {
           {done && (
             <div style={{ fontSize: 14, lineHeight: 1.55 }}>
               <p style={{ marginTop: 0 }}>
-                Se esse email existir, receberás dentro de instantes um link para redefinir a tua
-                palavra‑passe. O link expira após algum tempo e só pode ser usado uma vez.
+                If that email exists you will receive a reset link shortly. The link expires after a
+                limited time and can only be used once.
               </p>
-              <p style={{ opacity: 0.8 }}>Verifica também a tua pasta de spam / promoções.</p>
+              <p style={{ opacity: 0.8 }}>Be sure to also check your spam / promotions folder.</p>
               <div style={{ display: 'flex', gap: 12, marginTop: 22 }}>
                 <Link
                   href="/"
@@ -158,7 +157,7 @@ export default function ForgotPasswordPage() {
                   style={{ textDecoration: 'none', flex: 1, textAlign: 'center' }}
                 >
                   <div className="btn-inner">
-                    <span className="btn-text">Voltar à Home</span>
+                    <span className="btn-text">Back to Home</span>
                     <span className="btn-icon">
                       <i className="tji-arrow-right" />
                     </span>
@@ -173,7 +172,7 @@ export default function ForgotPasswordPage() {
                   className="btn btn-outline-light"
                   style={{ flex: '0 0 auto', whiteSpace: 'nowrap', borderRadius: 14 }}
                 >
-                  Outro email
+                  Use another email
                 </button>
               </div>
             </div>
@@ -187,7 +186,7 @@ export default function ForgotPasswordPage() {
                 textDecoration: 'none',
               }}
             >
-              Já tens um token? Redefinir agora
+              Already have a token? Reset now
             </Link>
           </div>
         </div>
@@ -198,4 +197,3 @@ export default function ForgotPasswordPage() {
     </main>
   );
 }
-

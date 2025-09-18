@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await fetchMe(data.access_token);
       return true;
     } catch (e: any) {
-      setError(e?.message || 'Falha ao iniciar sessão');
+      setError(e?.message || 'Failed to sign in');
       return false;
     }
   }, [applyToken, fetchMe]);
@@ -109,9 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       await AuthAPI.register({ email, password, username });
-      return true; // mostraremos mensagem para verificar email
+      return true; // will show message to check email
     } catch (e: any) {
-      setError(e?.message || 'Falha ao registar');
+      setError(e?.message || 'Failed to register');
       return false;
     }
   }, []);
@@ -164,9 +164,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth deve ser usado dentro de <AuthProvider />');
+  if (!ctx) throw new Error('useAuth must be used within <AuthProvider />');
   return ctx;
 }
 
 export default AuthProvider;
-

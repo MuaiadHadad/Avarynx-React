@@ -2,10 +2,10 @@
 // ============================================================================
 // /auth/callback
 // ----------------------------------------------------------------------------
-// Página de callback para fluxos OAuth (Google). O backend deve redirecionar
-// para esta rota após concluir a autenticação e definir o cookie refresh_token.
-// Aqui forçamos um refresh para obter o access_token e depois redirecionamos
-// o utilizador para a home (ou outra rota protegida futuramente).
+// Callback page for OAuth flows (Google). The backend should redirect
+// to this route after completing authentication and setting the refresh_token cookie.
+// Here we force a refresh to obtain the access_token and then redirect the
+// user to the home (or another protected route in the future).
 // ============================================================================
 
 import { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ export default function OAuthCallbackPage() {
   const router = useRouter();
   const { refreshNow } = useAuth();
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
-  const [message, setMessage] = useState('A concluir início de sessão...');
+  const [message, setMessage] = useState('Finishing sign-in...');
 
   useEffect(() => {
     (async () => {
@@ -24,16 +24,16 @@ export default function OAuthCallbackPage() {
         const ok = await refreshNow();
         if (ok) {
           setStatus('ok');
-          setMessage('Sessão iniciada. Redirecionando...');
+          setMessage('Signed in. Redirecting...');
           setTimeout(() => router.replace('/'), 800);
         } else {
           setStatus('error');
-          setMessage('Não foi possível validar a sessão.');
+          setMessage('Could not validate session.');
           setTimeout(() => router.replace('/'), 1500);
         }
       } catch (e) {
         setStatus('error');
-        setMessage('Erro inesperado no callback OAuth.');
+        setMessage('Unexpected error in OAuth callback.');
         setTimeout(() => router.replace('/'), 1500);
       }
     })();
@@ -75,4 +75,3 @@ export default function OAuthCallbackPage() {
     </main>
   );
 }
-

@@ -640,19 +640,19 @@ export default function HomePage() {
     username?: string;
   }) => {
     if (payload.mode === 'login') {
-      const ok = await login(payload.email, payload.password); // usa email também como identifier
+      const ok = await login(payload.email, payload.password); // uses email also as identifier
       if (ok) {
         setInfoMessage(null);
         setLoginOpen(false);
-        pushAlert('success', 'Sessão iniciada com sucesso');
+        pushAlert('success', 'Signed in successfully');
       }
       return;
     }
     // register
     const ok = await register(payload.email, payload.password, payload.username);
     if (ok) {
-      setInfoMessage('Conta criada. Verifique o seu email para ativar.');
-      pushAlert('success', 'Conta criada! Verifique o seu email para ativar.');
+      setInfoMessage('Account created. Check your email to activate it.');
+      pushAlert('success', 'Account created! Check your email to activate it.');
     }
   };
 
@@ -660,7 +660,7 @@ export default function HomePage() {
     if (provider === 'google') {
       loginWithGoogle();
     } else {
-      alert('OAuth para este provider ainda não está implementado.');
+      alert('OAuth for this provider is not implemented yet.');
     }
   };
 
