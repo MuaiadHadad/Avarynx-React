@@ -118,6 +118,23 @@ export function isExpired(token?: string | null) {
   return decoded.exp - 10 < now; // 10 segundos de margem
 }
 
+export async function apiForgotPassword(email: string) {
+  if (!email?.trim()) throw new Error('Email obrigatório');
+  return http<{ ok: boolean; message: string }>(`${API_BASE}/api/auth/forgot-password`, {
+    method: 'POST',
+    body: JSON.stringify({ email: email.trim().toLowerCase() }),
+  });
+}
+
+export async function apiResetPassword(params: { token: string; password: string }) {
+  if (!params.token) throw new Error('Token obrigatório');
+  if (!params.password) throw new Error('Password obrigatória');
+  return http<{ ok: boolean; message: string }>(`${API_BASE}/api/auth/reset-password`, {
+    method: 'POST',
+    body: JSON.stringify({ token: params.token, password: params.password }),
+  });
+}
+
 export const AuthAPI = {
   register: apiRegister,
   login: apiLogin,
@@ -128,6 +145,8 @@ export const AuthAPI = {
   decodeJwt,
   isExpired,
   API_BASE,
+  forgotPassword: apiForgotPassword,
+  resetPassword: apiResetPassword,
 };
 
 export default AuthAPI;

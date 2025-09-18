@@ -279,7 +279,8 @@ export default function LoginModal({
                       : `Signing in as ${email || 'your email'}`
                     : 'It takes less than a minute'}
                 </p>
-                {errorMessage && (
+                {/* Removido: alertas inline (errorMessage / infoMessage) para usar AlertCenter global na página inicial */}
+                {/* {errorMessage && (
                   <div className="alert alert-danger py-2 px-3 small" role="alert">
                     {errorMessage}
                   </div>
@@ -288,7 +289,7 @@ export default function LoginModal({
                   <div className="alert alert-info py-2 px-3 small" role="status">
                     {infoMessage}
                   </div>
-                )}
+                )} */}
               </div>
 
               {/* Social logins (apenas no login passo 1) */}
@@ -414,6 +415,17 @@ export default function LoginModal({
                           {showPassword ? 'Hide' : 'Show'}
                         </button>
                       </div>
+                      {mode === 'login' && step === 2 && (
+                        <div className="mt-1 text-end">
+                          <Link
+                            href="/auth/forgot-password"
+                            className="text-decoration-none"
+                            style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.65)' }}
+                          >
+                            Esqueceste a palavra‑passe?
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   )}
 

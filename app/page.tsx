@@ -9,6 +9,7 @@ import Footer from '@/components/sections/Footer';
 import Main from '@/components/sections/Main';
 import LoginModal from '@/components/auth/LoginModal';
 import { useAuth } from '@/components/auth/AuthProvider';
+import AlertCenter, { AlertData } from '@/components/alerts/AlertCenter';
 
 declare global {
   interface Window {
@@ -63,6 +64,29 @@ export default function HomePage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const { login, register, loginWithGoogle, error: authError } = useAuth();
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [alerts, setAlerts] = useState<AlertData[]>([]); // novos alertas globais
+
+  // Helper para adicionar alert
+  const pushAlert = (kind: AlertData['kind'], message: string, ttl?: number) => {
+    setAlerts((prev) => [
+      ...prev,
+      { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, kind, message, ttl },
+    ]);
+  };
+
+  // Observa erros de auth e mostra alerta fora do modal
+  useEffect(() => {
+    if (authError) {
+      pushAlert('error', authError);
+    }
+  }, [authError]);
+
+  // Observa infoMessage (ex: conta criada)
+  useEffect(() => {
+    if (infoMessage) {
+      pushAlert('info', infoMessage, 7000);
+    }
+  }, [infoMessage]);
 
   useEffect(() => {
     const initializeAvatar = async () => {
@@ -620,14 +644,15 @@ export default function HomePage() {
       if (ok) {
         setInfoMessage(null);
         setLoginOpen(false);
+        pushAlert('success', 'Sessão iniciada com sucesso');
       }
       return;
     }
     // register
     const ok = await register(payload.email, payload.password, payload.username);
     if (ok) {
-      // Mostra instrução para verificar email; mantém modal aberto para feedback
       setInfoMessage('Conta criada. Verifique o seu email para ativar.');
+      pushAlert('success', 'Conta criada! Verifique o seu email para ativar.');
     }
   };
 
@@ -644,13 +669,17 @@ export default function HomePage() {
       <Header onLoginClickAction={() => { setLoginOpen(true); setInfoMessage(null); }} />
       <Main />
       <Footer />
+      {/* Centro de Alertas Animados */}
+      <AlertCenter
+        alerts={alerts}
+        onDismiss={(id) => setAlerts((prev) => prev.filter((a) => a.id !== id))}
+      />
       <LoginModal
         open={loginOpen}
         onCloseAction={() => setLoginOpen(false)}
         onSubmitAction={handleAuthSubmit}
         onProviderAction={handleProvider}
-        errorMessage={authError}
-        infoMessage={infoMessage}
+        // Removido: não passamos errorMessage/infoMessage para não aparecer dentro do modal
       />
     </>
   );
