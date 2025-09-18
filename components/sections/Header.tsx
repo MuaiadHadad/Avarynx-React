@@ -1,8 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
+/* eslint-disable prettier/prettier */
 'use client';
 
 import Link from 'next/link';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Mantido para compatibilidade: callback para abrir modal de login
 // Se o usuário estiver autenticado mostramos info + logout
@@ -14,6 +16,37 @@ type HeaderProps = {
 
 export default function Header({ onLoginClickAction }: HeaderProps) {
   const { user, logout, loading } = useAuth();
+  // Estado para dropdown do utilizador
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const avatarBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const toggleMenu = useCallback(() => setMenuOpen(o => !o), []);
+
+  // Fechar ao clicar fora
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (!menuRef.current) return;
+      if (menuRef.current.contains(e.target as Node)) return;
+      if (avatarBtnRef.current?.contains(e.target as Node)) return;
+      closeMenu();
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') closeMenu();
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [menuOpen, closeMenu]);
+
+  const displayName = (user?.username && user.username.trim()) || user?.email || '';
+  const initials = displayName ? displayName.trim().charAt(0).toUpperCase() : '?';
+  const verified = !!user?.email_verified;
 
   return (
     <>
@@ -36,7 +69,7 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                   </div>
 
                   {/* Lado direito (auth) */}
-                  <div className="header-right-item d-none d-lg-inline-flex align-items-center gap-3">
+                  <div className="header-right-item d-none d-lg-inline-flex align-items-center gap-3 relative">
                     {loading && (
                       <span className="text-white-50 small" aria-live="polite">
                         Carregando sessão...
@@ -44,34 +77,106 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                     )}
 
                     {!loading && user && (
-                      <div className="d-flex align-items-center gap-3">
-                        <div className="d-flex flex-column text-end">
-                          <span className="text-white fw-semibold" style={{ lineHeight: 1 }}>
-                            {user.username || user.email}
+                      <div className="flex items-center gap-4 pl-2 pr-1">
+                        <div className="hidden md:flex flex-col items-end max-w-[200px]">
+                          <span className="text-sm font-semibold text-white leading-tight truncate">
+                            {displayName}
                           </span>
                           <span
-                            className={`small ${user.email_verified ? 'text-success' : 'text-warning'}`}
-                            style={{ lineHeight: 1 }}
+                            className={`mt-0.5 inline-flex items-center gap-1 text-[11px] leading-none font-medium ${verified ? 'text-emerald-400' : 'text-amber-400'}`}
                           >
-                            {user.email_verified ? 'Verificado' : 'Não verificado'}
+                            <span
+                              className={`w-2 h-2 rounded-full ${verified ? 'bg-emerald-400' : 'bg-amber-400'} animate-pulse`}
+                              aria-hidden="true"
+                            />
+                            {verified ? 'Verificado' : 'Não verificado'}
                           </span>
                         </div>
-                        {/* Avatar simples com inicial */}
-                        <div
-                          className="d-inline-flex justify-content-center align-items-center rounded-circle bg-primary text-white fw-bold"
-                          style={{ width: 46, height: 46 }}
-                          aria-label="User avatar"
+
+                        {/* Botão Avatar + toggle menu */}
+                        <button
+                          ref={avatarBtnRef}
+                          type="button"
+                          onClick={toggleMenu}
+                          aria-haspopup="menu"
+                          aria-expanded={menuOpen}
+                          className="relative outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-full group"
                         >
-                          {(user.username || user.email || '?').charAt(0).toUpperCase()}
-                        </div>
+                          <span className="sr-only">Abrir menu do utilizador</span>
+                          <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-lg select-none
+                                       bg-gradient-to-br from-primary-600 to-primary-700 ring-2 ring-primary-600/50 ring-offset-2 ring-offset-[#202020]
+                                       transition-all duration-300 group-hover:scale-105 group-active:scale-95 shadow-md shadow-primary-900/40"
+                          >
+                            {initials}
+                          </div>
+                          {verified && (
+                            <span
+                              className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#202020] text-white flex items-center justify-center text-[10px] font-bold shadow"
+                              title="Email verificado"
+                            >
+                              ✓
+                            </span>
+                          )}
+                        </button>
+
+                        {/* Botão logout direto (desktop largo) */}
                         <button
                           type="button"
                           onClick={logout}
-                          className="btn btn-sm btn-outline-light"
+                          className="hidden xl:inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-primary-600/40
+                                     bg-[#202020] text-white hover:bg-primary-700/25 hover:border-primary-500/60 transition-colors
+                                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                           aria-label="Terminar sessão"
                         >
                           Sair
                         </button>
+
+                        {/* Dropdown */}
+                        {menuOpen && (
+                          <div
+                            ref={menuRef}
+                            role="menu"
+                            aria-label="Menu do utilizador"
+                            className="absolute right-0 top-full mt-3 w-64 rounded-lg border border-primary-600/30 bg-[#202020]/95 backdrop-blur-sm
+                                       shadow-xl shadow-black/40 p-4 animate-fade-in z-50"
+                          >
+                            <div className="flex items-center gap-3 pb-3 mb-3 border-b border-primary-600/20">
+                              <div className="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white bg-gradient-to-br from-primary-600 to-primary-700 ring-2 ring-primary-600/40">
+                                {initials}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-white leading-tight truncate">{displayName}</p>
+                                <p className="text-[11px] text-white/60 truncate">{user.email}</p>
+                              </div>
+                            </div>
+                            <ul className="flex flex-col gap-1 text-sm" role="none">
+                              <li role="none">
+                                <span
+                                  className={`w-full inline-flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium select-none ${verified ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10'}`}
+                                  role="menuitem"
+                                >
+                                  <span
+                                    className={`w-2 h-2 rounded-full ${verified ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                                    aria-hidden="true"
+                                  />
+                                  {verified ? 'Email verificado' : 'Email não verificado'}
+                                </span>
+                              </li>
+                              <li role="none">
+                                <button
+                                  type="button"
+                                  onClick={logout}
+                                  role="menuitem"
+                                  className="w-full text-left px-3 py-2 rounded-md bg-red-600/10 hover:bg-red-600/20 text-red-300 hover:text-red-200
+                                             transition-colors text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                >
+                                  Terminar sessão
+                                </button>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
 
