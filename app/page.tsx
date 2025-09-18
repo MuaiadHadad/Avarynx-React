@@ -8,6 +8,7 @@ import Header from '@/components/sections/Header';
 import Footer from '@/components/sections/Footer';
 import Main from '@/components/sections/Main';
 import LoginModal from '@/components/auth/LoginModal';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 declare global {
   interface Window {
@@ -60,6 +61,8 @@ type TalkingHeadLike = {
 
 export default function HomePage() {
   const [loginOpen, setLoginOpen] = useState(false);
+  const { login, register, loginWithGoogle, error: authError } = useAuth();
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const initializeAvatar = async () => {
@@ -612,20 +615,33 @@ export default function HomePage() {
     password: string;
     username?: string;
   }) => {
-    // TODO: trocar por API real
-    console.log('Auth submit', payload);
-    setLoginOpen(false);
+    if (payload.mode === 'login') {
+      const ok = await login(payload.email, payload.password); // usa email também como identifier
+      if (ok) {
+        setInfoMessage(null);
+        setLoginOpen(false);
+      }
+      return;
+    }
+    // register
+    const ok = await register(payload.email, payload.password, payload.username);
+    if (ok) {
+      // Mostra instrução para verificar email; mantém modal aberto para feedback
+      setInfoMessage('Conta criada. Verifique o seu email para ativar.');
+    }
   };
 
   const handleProvider = (provider: 'google' | 'microsoft' | 'linkedin') => {
-    // TODO: iniciar fluxo OAuth
-    console.log('Auth provider', provider);
-    setLoginOpen(false);
+    if (provider === 'google') {
+      loginWithGoogle();
+    } else {
+      alert('OAuth para este provider ainda não está implementado.');
+    }
   };
 
   return (
     <>
-      <Header onLoginClickAction={() => setLoginOpen(true)} />
+      <Header onLoginClickAction={() => { setLoginOpen(true); setInfoMessage(null); }} />
       <Main />
       <Footer />
       <LoginModal
@@ -633,6 +649,8 @@ export default function HomePage() {
         onCloseAction={() => setLoginOpen(false)}
         onSubmitAction={handleAuthSubmit}
         onProviderAction={handleProvider}
+        errorMessage={authError}
+        infoMessage={infoMessage}
       />
     </>
   );

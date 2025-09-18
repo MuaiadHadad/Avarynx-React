@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import RootProviders from '@/components/auth/RootProviders';
 
 export const metadata: Metadata = {
   title: 'Avarynx AI',
@@ -66,46 +67,49 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
       </head>
       <body suppressHydrationWarning={true}>
-        <div className="body-overlay"></div>
+        {/* RootProviders contém AuthProvider e futuros providers globais */}
+        <RootProviders>
+          <div className="body-overlay"></div>
 
-        {/* Preloader */}
-        <div className="preloader">
-          <div className="loading-container">
-            <div className="loading"></div>
-            <div id="loading-icon">
-              <img src="/assets/images/logos/logo-icon.webp" alt="Loading" />
+          {/* Preloader */}
+          <div className="preloader">
+            <div className="loading-container">
+              <div className="loading"></div>
+              <div id="loading-icon">
+                <img src="/assets/images/logos/logo-icon.webp" alt="Loading" />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Back to top */}
-        <div className="back-to-top-wrapper">
-          <button id="back_to_top" type="button" className="back-to-top-btn">
-            <span>
-              <i className="tji-rocket"></i>
-            </span>
-          </button>
-        </div>
+          {/* Back to top */}
+          <div className="back-to-top-wrapper">
+            <button id="back_to_top" type="button" className="back-to-top-btn">
+              <span>
+                <i className="tji-rocket"></i>
+              </span>
+            </button>
+          </div>
 
-        {children}
+          {children}
 
-        {/* Original JS Dependencies */}
-        <script src="/assets/js/jquery.min.js"></script>
-        <script src="/assets/js/bootstrap.bundle.min.js"></script>
-        <script src="/assets/js/gsap.min.js"></script>
-        <script src="/assets/js/gsap-scroll-to-plugin.min.js"></script>
-        <script src="/assets/js/gsap-scroll-trigger.min.js"></script>
-        <script src="/assets/js/gsap-split-text.min.js"></script>
-        <script src="/assets/js/smooth-scroll.min.js"></script>
-        <script src="/assets/js/jquery.nice-select.min.js"></script>
-        <script src="/assets/js/swiper.min.js"></script>
-        <script src="/assets/js/waypoints.min.js"></script>
-        <script src="/assets/js/counterup.min.js"></script>
-        <script src="/assets/js/venobox.min.js"></script>
-        <script src="/assets/js/appear.min.js"></script>
-        <script src="/assets/js/wow.min.js"></script>
-        <script src="/assets/js/meanmenu.js"></script>
-        <script src="/assets/js/main.js"></script>
+          {/* Scripts originais */}
+          <script src="/assets/js/jquery.min.js"></script>
+          <script src="/assets/js/bootstrap.bundle.min.js"></script>
+          <script src="/assets/js/gsap.min.js"></script>
+          <script src="/assets/js/gsap-scroll-to-plugin.min.js"></script>
+          <script src="/assets/js/gsap-scroll-trigger.min.js"></script>
+          <script src="/assets/js/gsap-split-text.min.js"></script>
+          <script src="/assets/js/smooth-scroll.min.js"></script>
+          <script src="/assets/js/jquery.nice-select.min.js"></script>
+          <script src="/assets/js/swiper.min.js"></script>
+          <script src="/assets/js/waypoints.min.js"></script>
+          <script src="/assets/js/counterup.min.js"></script>
+          <script src="/assets/js/venobox.min.js"></script>
+          <script src="/assets/js/appear.min.js"></script>
+          <script src="/assets/js/wow.min.js"></script>
+          <script src="/assets/js/meanmenu.js"></script>
+          <script src="/assets/js/main.js"></script>
+        </RootProviders>
       </body>
     </html>
   );

@@ -14,6 +14,8 @@ export type LoginModalProps = {
     username?: string;
   }) => Promise<void> | void;
   onProviderAction?: (provider: 'google' | 'microsoft' | 'linkedin') => void;
+  errorMessage?: string | null; // mensagem de erro (ex: credenciais inválidas)
+  infoMessage?: string | null;  // mensagem informativa (ex: verifique seu email)
 };
 
 // Caminho do background decorativo (ajusta conforme o teu public/)
@@ -100,6 +102,8 @@ export default function LoginModal({
   onCloseAction,
   onSubmitAction,
   onProviderAction,
+  errorMessage,
+  infoMessage,
 }: LoginModalProps) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [step, setStep] = useState<1 | 2>(1); // login: 1=email, 2=password
@@ -275,6 +279,16 @@ export default function LoginModal({
                       : `Signing in as ${email || 'your email'}`
                     : 'It takes less than a minute'}
                 </p>
+                {errorMessage && (
+                  <div className="alert alert-danger py-2 px-3 small" role="alert">
+                    {errorMessage}
+                  </div>
+                )}
+                {infoMessage && !errorMessage && (
+                  <div className="alert alert-info py-2 px-3 small" role="status">
+                    {infoMessage}
+                  </div>
+                )}
               </div>
 
               {/* Social logins (apenas no login passo 1) */}
