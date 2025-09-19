@@ -596,7 +596,7 @@ export default function HomePage() {
               language_input: 'pt-pt',
               language_output: 'pt-pt',
             },
-            message_history: messageHistory.slice(-20),
+            message_history: messageHistory.slice(),
             text: message,
             audio_bytes: null,
           };
