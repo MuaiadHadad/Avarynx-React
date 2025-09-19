@@ -8,7 +8,7 @@ import Header from '@/components/sections/Header';
 import Footer from '@/components/sections/Footer';
 import Main from '@/components/sections/Main';
 import { useAuth } from '@/components/auth/AuthProvider';
-// import AlertCenter, { type AlertData } from '@/components/alerts/AlertCenter';
+import AlertCenter, { type AlertData } from '@/components/alerts/AlertCenter';
 
 declare global {
   interface Window {
@@ -62,15 +62,15 @@ type TalkingHeadLike = {
 export default function HomePage() {
   const { login, register, loginWithGoogle, error: authError } = useAuth();
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  // const [alerts, setAlerts] = useState<AlertData[]>([]); // novos alertas globais
+  const [alerts, setAlerts] = useState<AlertData[]>([]); // novos alertas globais
 
   // Helper para adicionar alert
-  // const pushAlert = (kind: AlertData['kind'], message: string, ttl?: number) => {
-  //   setAlerts((prev) => [
-  //     ...prev,
-  //     { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, kind, message, ttl },
-  //   ]);
-  // };
+  const pushAlert = (kind: AlertData['kind'], message: string, ttl?: number) => {
+    setAlerts((prev) => [
+      ...prev,
+      { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, kind, message, ttl },
+    ]);
+  };
 
   // Observa erros de auth e mostra alerta fora do modal
   useEffect(() => {
@@ -160,29 +160,173 @@ export default function HomePage() {
         const maxReconnectAttempts = 5;
 
         // ------- Helpers -------
+        // Typewriter streaming state for assistant messages
+        const typingState: {
+          el: HTMLDivElement | null;
+          target: string;
+          shown: number;
+          raf: number | null;
+          lastTs: number;
+          carry: number;
+          caret: HTMLSpanElement | null;
+          finalizeTimer: number | null;
+        } = {
+          el: null,
+          target: '',
+          shown: 0,
+          raf: null,
+          lastTs: 0,
+          carry: 0,
+          caret: null,
+          finalizeTimer: null,
+        };
+
+        const CPS = 50; // characters per second
+        const IDLE_FINALIZE_MS = 500; // after no new chunks, finalize to formatted HTML
+
+        function ensureTranscript(): HTMLElement | null {
+          return document.getElementById('chat-transcript') as HTMLElement | null;
+        }
+
+        function attachCaret(el: HTMLDivElement) {
+          if (typingState.caret && typingState.caret.parentElement === el) return;
+          const caret = document.createElement('span');
+          caret.className = 'inline-block w-2 h-4 align-[-2px] ml-0.5 bg-white/70 animate-pulse';
+          el.appendChild(caret);
+          typingState.caret = caret as HTMLSpanElement;
+        }
+
+        function removeCaret() {
+          if (typingState.caret && typingState.caret.parentElement) {
+            typingState.caret.parentElement.removeChild(typingState.caret);
+          }
+          typingState.caret = null;
+        }
+
+        async function finalizeAssistantHTML(el: HTMLDivElement | null, full: string) {
+          if (!el) return;
+          try {
+            const { marked } = await import('marked');
+            const { default: DOMPurify } = await import('dompurify');
+            marked.setOptions({ breaks: true, gfm: true } as any);
+            const htmlContent = (await marked.parse(String(full))) as string;
+            const sanitized = DOMPurify.sanitize(htmlContent);
+            // el may have been removed; guard again
+            if (el) el.innerHTML = sanitized;
+          } catch {
+            if (el) el.textContent = full;
+          }
+        }
+
+        function finalizeNowAndReset() {
+          if (typingState.finalizeTimer) {
+            clearTimeout(typingState.finalizeTimer);
+            typingState.finalizeTimer = null;
+          }
+          const el = typingState.el;
+          const full = typingState.target;
+          removeCaret();
+          void finalizeAssistantHTML(el, full);
+          if (typingState.raf) cancelAnimationFrame(typingState.raf);
+          typingState.el = null;
+          typingState.target = '';
+          typingState.shown = 0;
+          typingState.carry = 0;
+          typingState.lastTs = 0;
+        }
+
+        function scheduleFinalize() {
+          if (typingState.finalizeTimer) {
+            clearTimeout(typingState.finalizeTimer);
+            typingState.finalizeTimer = null;
+          }
+          const el = typingState.el;
+          const full = typingState.target;
+          typingState.finalizeTimer = window.setTimeout(async () => {
+            removeCaret();
+            await finalizeAssistantHTML(el, full);
+            typingState.finalizeTimer = null;
+          }, IDLE_FINALIZE_MS) as unknown as number;
+        }
+
+        function tickTypewriter(ts: number) {
+          if (!typingState.el) return;
+          const last = typingState.lastTs || ts;
+          const dt = (ts - last) / 1000;
+          typingState.lastTs = ts;
+
+          const remaining = typingState.target.length - typingState.shown;
+          if (remaining <= 0) {
+            // no new chars; keep caret blinking and plan finalize soon
+            scheduleFinalize();
+            typingState.raf = requestAnimationFrame(tickTypewriter);
+            return;
+          }
+
+          typingState.carry += dt * CPS;
+          let add = Math.floor(typingState.carry);
+          if (add > 0) typingState.carry -= add;
+          if (add <= 0) {
+            typingState.raf = requestAnimationFrame(tickTypewriter);
+            return;
+          }
+
+          const take = Math.min(add, remaining);
+          typingState.shown += take;
+
+          // Update element text content (plain while typing)
+          const slice = typingState.target.slice(0, typingState.shown);
+          typingState.el.textContent = slice;
+          attachCaret(typingState.el);
+
+          const transcript = ensureTranscript();
+          if (transcript) (transcript as HTMLElement).scrollTop = transcript.scrollHeight;
+
+          typingState.raf = requestAnimationFrame(tickTypewriter);
+        }
+
+        function startAssistantTyping(initialText: string) {
+          const transcript = ensureTranscript();
+          if (!transcript) return;
+          const div = document.createElement('div');
+          div.className = 'chat-msg assistant';
+          transcript.appendChild(div);
+
+          typingState.el = div;
+          typingState.target = String(initialText ?? '');
+          typingState.shown = 0;
+          typingState.carry = 0;
+          typingState.lastTs = 0;
+          attachCaret(div);
+          if (typingState.raf) cancelAnimationFrame(typingState.raf);
+          typingState.raf = requestAnimationFrame(tickTypewriter);
+        }
+
+        function updateAssistantTyping(appendText: string) {
+          if (!typingState.el) {
+            startAssistantTyping(appendText);
+            return;
+          }
+          typingState.target += String(appendText ?? '');
+          attachCaret(typingState.el);
+          if (!typingState.raf) typingState.raf = requestAnimationFrame(tickTypewriter);
+        }
+
         async function addChatMessage(role: 'user' | 'assistant', content: string) {
           try {
             const transcript = document.getElementById('chat-transcript');
             if (!transcript) return;
 
-            const div = document.createElement('div');
-            div.className = `chat-msg ${role}`;
-
             if (role === 'assistant') {
-              try {
-                const { marked } = await import('marked');
-                const { default: DOMPurify } = await import('dompurify');
-                marked.setOptions({ breaks: true, gfm: true } as any);
-                const htmlContent = (await marked.parse(String(content ?? '').trim())) as string;
-                const sanitizedHtml = DOMPurify.sanitize(htmlContent);
-                div.innerHTML = sanitizedHtml;
-              } catch {
-                div.textContent = String(content ?? '').trim();
-              }
-            } else {
-              div.textContent = String(content ?? '').trim();
+              // Stream with typewriter animation; format nicely when done
+              updateAssistantTyping(String(content ?? ''));
+              return;
             }
 
+            // user message (no animation)
+            const div = document.createElement('div');
+            div.className = `chat-msg ${role}`;
+            div.textContent = String(content ?? '').trim();
             transcript.appendChild(div);
             (transcript as HTMLElement).scrollTop = (transcript as HTMLElement).scrollHeight;
           } catch (e) {
@@ -554,6 +698,9 @@ export default function HomePage() {
               const msg = textarea.value.trim();
               if (!msg) return;
 
+              // Finish any ongoing assistant streaming so next reply starts a new message block
+              finalizeNowAndReset();
+
               addChatMessage('user', msg);
               messageHistory.push({ role: 'user', content: msg });
               textarea.value = '';
@@ -667,10 +814,10 @@ export default function HomePage() {
       <Main />
       <Footer />
       {/* Centro de Alertas Animados */}
-      {/*<AlertCenter*/}
-      {/*  alerts={alerts}*/}
-      {/*  onDismiss={(id) => setAlerts((prev) => prev.filter((a) => a.id !== id))}*/}
-      {/*/>*/}
+      <AlertCenter
+        alerts={alerts}
+        onDismiss={(id) => setAlerts((prev) => prev.filter((a) => a.id !== id))}
+      />
     </>
   );
 }
