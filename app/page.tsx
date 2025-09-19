@@ -7,9 +7,8 @@ import { connectToCorrectWebSocket } from '@/lib/websocket';
 import Header from '@/components/sections/Header';
 import Footer from '@/components/sections/Footer';
 import Main from '@/components/sections/Main';
-import LoginModal from '@/components/auth/LoginModal';
 import { useAuth } from '@/components/auth/AuthProvider';
-import AlertCenter, { AlertData } from '@/components/alerts/AlertCenter';
+// import AlertCenter, { type AlertData } from '@/components/alerts/AlertCenter';
 
 declare global {
   interface Window {
@@ -61,7 +60,6 @@ type TalkingHeadLike = {
 };
 
 export default function HomePage() {
-  const [loginOpen, setLoginOpen] = useState(false);
   const { login, register, loginWithGoogle, error: authError } = useAuth();
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<AlertData[]>([]); // novos alertas globais
@@ -643,7 +641,6 @@ export default function HomePage() {
       const ok = await login(payload.email, payload.password); // uses email also as identifier
       if (ok) {
         setInfoMessage(null);
-        setLoginOpen(false);
         pushAlert('success', 'Signed in successfully');
       }
       return;
@@ -666,21 +663,14 @@ export default function HomePage() {
 
   return (
     <>
-      <Header onLoginClickAction={() => { setLoginOpen(true); setInfoMessage(null); }} />
+      <Header />
       <Main />
       <Footer />
       {/* Centro de Alertas Animados */}
-      <AlertCenter
-        alerts={alerts}
-        onDismiss={(id) => setAlerts((prev) => prev.filter((a) => a.id !== id))}
-      />
-      <LoginModal
-        open={loginOpen}
-        onCloseAction={() => setLoginOpen(false)}
-        onSubmitAction={handleAuthSubmit}
-        onProviderAction={handleProvider}
-        // Removido: não passamos errorMessage/infoMessage para não aparecer dentro do modal
-      />
+      {/*<AlertCenter*/}
+      {/*  alerts={alerts}*/}
+      {/*  onDismiss={(id) => setAlerts((prev) => prev.filter((a) => a.id !== id))}*/}
+      {/*/>*/}
     </>
   );
 }

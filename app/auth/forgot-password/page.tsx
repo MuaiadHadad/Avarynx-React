@@ -7,22 +7,39 @@
 import { useState } from 'react';
 import AuthAPI from '@/lib/auth/api';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import AlertCenter, { type AlertData } from '@/components/alerts/AlertCenter';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [alerts, setAlerts] = useState<AlertData[]>([]);
+  const router = useRouter();
+
+  // Helper para adicionar alert
+  const pushAlert = (kind: AlertData['kind'], message: string, ttl?: number) => {
+    setAlerts((prev) => [
+      ...prev,
+      { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, kind, message, ttl },
+    ]);
+  };
+
+  // Helper para remover alert
+  const dismissAlert = (id: string) => {
+    setAlerts((prev) => prev.filter((alert) => alert.id !== id));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting || !email.trim()) return;
     setSubmitting(true);
-    setError(null);
+    setAlerts([]); // Clear any existing alerts
     try {
       await AuthAPI.forgotPassword(email.trim());
       // Always show generic message
       setDone(true);
+      pushAlert('success', 'If that email exists, you will receive a reset link shortly. Check your spam folder too.', 10000);
     } catch (err: any) {
       // Even in case of error, do not expose if email exists
       // But we can log to console in dev
@@ -31,6 +48,7 @@ export default function ForgotPasswordPage() {
         console.warn('[forgot-password] error:', err?.message);
       }
       setDone(true);
+      pushAlert('info', 'If that email exists, you will receive a reset link shortly. Check your spam folder too.', 10000);
     } finally {
       setSubmitting(false);
     }
@@ -51,6 +69,16 @@ export default function ForgotPasswordPage() {
       }}
     >
       <div style={{ width: '100%', maxWidth: 480 }}>
+          {/* Logo */}
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <Link href="/">
+                  <img
+                      src="/assets/images/logos/logoA.webp"
+                      alt="Logo"
+                      style={{ height: '60px' }}
+                  />
+              </Link>
+          </div>
         <div
           style={{
             background: 'linear-gradient(145deg,#1f1a46,#141029)',
@@ -110,25 +138,25 @@ export default function ForgotPasswordPage() {
                   if (e.key === 'Enter' && !email.trim()) e.preventDefault();
                 }}
               />
-              {error && (
-                <div
-                  role="alert"
-                  style={{
-                    background: 'linear-gradient(90deg,#c026d3,#db2777)',
-                    padding: '0.65rem 0.85rem',
-                    borderRadius: 10,
-                    fontSize: 13,
-                    marginBottom: '0.9rem',
-                  }}
-                >
-                  {error}
-                </div>
-              )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <button
+                        type="button"
+                        onClick={() => router.push('/auth/login')}
+                        aria-label="Back to home"
+                        className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                        style={{ width: '37%', opacity: submitting ? 0.8 : 1, display: 'flex', marginRight: 'auto' }}
+                    >
+                        <div className="btn-inner">
+                            <span className="btn-icon h-icon"><i className="tji-arrow-left" /></span>
+                            <span className="btn-text">Get back</span>
+                            <span className="btn-icon"><i className="tji-arrow-left" /></span>
+                        </div>
+                    </button>
               <button
                 type="submit"
                 disabled={submitting || !email.trim()}
                 className="tj-primary-btn"
-                style={{ width: '100%', opacity: submitting ? 0.8 : 1 }}
+                style={{ width: '50%', opacity: submitting ? 0.8 : 1,display: 'flex',marginLeft: 'auto' }}
                 aria-busy={submitting}
               >
                 <div className="btn-inner">
@@ -140,6 +168,7 @@ export default function ForgotPasswordPage() {
                   </span>
                 </div>
               </button>
+                </div>
             </form>
           )}
 
@@ -151,10 +180,28 @@ export default function ForgotPasswordPage() {
               </p>
               <p style={{ opacity: 0.8 }}>Be sure to also check your spam / promotions folder.</p>
               <div style={{ display: 'flex', gap: 12, marginTop: 22 }}>
+                  <button
+                      type="button"
+                      onClick={() => {
+                          setDone(false);
+                          setEmail('');
+                      }}
+                      className="tj-primary-btn"
+                      style={{width: '50%', flex: '0 0 auto' }}
+                  >
+                      <div className="btn-inner">
+                  <span className="btn-text">
+                     another email?
+                  </span>
+                          <span className="btn-icon">
+                    <i className="tji-arrow-right" />
+                  </span>
+                      </div>
+                  </button>
                 <Link
                   href="/"
-                  className="tj-primary-btn"
-                  style={{ textDecoration: 'none', flex: 1, textAlign: 'center' }}
+                  className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                  style={{width: '50%', textDecoration: 'none', flex: 1, textAlign: 'center',display: 'flex',marginLeft: 'auto' }}
                 >
                   <div className="btn-inner">
                     <span className="btn-text">Back to Home</span>
@@ -163,37 +210,16 @@ export default function ForgotPasswordPage() {
                     </span>
                   </div>
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDone(false);
-                    setEmail('');
-                  }}
-                  className="btn btn-outline-light"
-                  style={{ flex: '0 0 auto', whiteSpace: 'nowrap', borderRadius: 14 }}
-                >
-                  Use another email
-                </button>
+
               </div>
             </div>
           )}
-          <div style={{ marginTop: 28 }}>
-            <Link
-              href="/auth/reset-password"
-              style={{
-                color: '#9ca3af',
-                fontSize: 12,
-                textDecoration: 'none',
-              }}
-            >
-              Already have a token? Reset now
-            </Link>
-          </div>
         </div>
         <p style={{ textAlign: 'center', fontSize: 12, opacity: 0.55, marginTop: 28 }}>
           &copy; {new Date().getFullYear()} Avarynx
         </p>
       </div>
+      <AlertCenter alerts={alerts} onDismiss={dismissAlert} />
     </main>
   );
 }

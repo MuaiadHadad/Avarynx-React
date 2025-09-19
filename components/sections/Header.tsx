@@ -5,15 +5,12 @@ import Link from 'next/link';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-// Mantido para compatibilidade: callback para abrir modal de login
-// Se o usuário estiver autenticado mostramos info + logout
-// Caso contrário, mostramos botão de login
-
+// Header component now navigates to /auth/login instead of using modal
 type HeaderProps = {
-  onLoginClickAction?: () => void;
+  // Remove onLoginClickAction since we're using navigation now
 };
 
-export default function Header({ onLoginClickAction }: HeaderProps) {
+export default function Header({}: HeaderProps) {
   const { user, logout, loading } = useAuth();
   // Estado para dropdown do utilizador
   const [menuOpen, setMenuOpen] = useState(false);
@@ -183,11 +180,10 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
 
                     {!loading && !user && (
                       <div className="header-button">
-                        <button
-                          type="button"
-                          onClick={onLoginClickAction}
+                        <Link
+                          href="/auth/login"
                           className="tj-primary-btn"
-                          aria-label="Abrir modal de login"
+                          aria-label="Ir para página de login"
                         >
                           <div className="btn-inner">
                             <span className="btn-icon h-icon">
@@ -198,7 +194,7 @@ export default function Header({ onLoginClickAction }: HeaderProps) {
                               <i className="tji-arrow-right"></i>
                             </span>
                           </div>
-                        </button>
+                        </Link>
                       </div>
                     )}
                   </div>
