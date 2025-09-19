@@ -15,7 +15,7 @@ export type LoginModalProps = {
   }) => Promise<void> | void;
   onProviderAction?: (provider: 'google' | 'microsoft' | 'linkedin') => void;
   errorMessage?: string | null; // mensagem de erro (ex: credenciais inválidas)
-  infoMessage?: string | null;  // mensagem informativa (ex: verifique seu email)
+  infoMessage?: string | null; // mensagem informativa (ex: verifique seu email)
 };
 
 // Caminho do background decorativo (ajusta conforme o teu public/)

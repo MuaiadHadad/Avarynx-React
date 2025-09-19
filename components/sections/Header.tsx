@@ -18,7 +18,7 @@ export default function Header({}: HeaderProps) {
   const avatarBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
-  const toggleMenu = useCallback(() => setMenuOpen(o => !o), []);
+  const toggleMenu = useCallback(() => setMenuOpen((o) => !o), []);
 
   // Fechar ao clicar fora
   useEffect(() => {
@@ -124,9 +124,13 @@ export default function Header({}: HeaderProps) {
                           className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                         >
                           <div className="btn-inner">
-                            <span className="btn-icon h-icon"><i className="tji-arrow-right" /></span>
+                            <span className="btn-icon h-icon">
+                              <i className="tji-arrow-right" />
+                            </span>
                             <span className="btn-text">Logout</span>
-                            <span className="btn-icon"><i className="tji-arrow-right" /></span>
+                            <span className="btn-icon">
+                              <i className="tji-arrow-right" />
+                            </span>
                           </div>
                         </button>
 
@@ -144,7 +148,9 @@ export default function Header({}: HeaderProps) {
                                 {initials}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm font-semibold text-white leading-tight truncate">{displayName}</p>
+                                <p className="text-sm font-semibold text-white leading-tight truncate">
+                                  {displayName}
+                                </p>
                                 <p className="text-[11px] text-white/60 truncate">{user.email}</p>
                               </div>
                             </div>
@@ -169,7 +175,7 @@ export default function Header({}: HeaderProps) {
                                   className="w-full text-left px-3 py-2 rounded-md bg-red-600/10 hover:bg-red-600/20 text-red-300 hover:text-red-200
                                              transition-colors text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                                 >
-                                 Logout
+                                  Logout
                                 </button>
                               </li>
                             </ul>

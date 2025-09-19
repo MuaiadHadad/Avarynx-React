@@ -39,46 +39,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const scheduleRefresh = useCallback((token: string) => {
-    clearRefreshTimer();
-    const decoded = decodeJwt(token);
-    if (!decoded?.exp) return;
-    const expMs = decoded.exp * 1000;
-    const now = Date.now();
-    const ttl = expMs - now;
-    if (ttl <= 0) return;
-    const margin = Math.min(60_000, Math.max(ttl * 0.5, 5_000));
-    const delay = Math.max(ttl - margin, 5_000);
-    refreshTimerRef.current = setTimeout(() => {
-      refreshNow();
-    }, delay);
-  }, [clearRefreshTimer]);
+  const scheduleRefresh = useCallback(
+    (token: string) => {
+      clearRefreshTimer();
+      const decoded = decodeJwt(token);
+      if (!decoded?.exp) return;
+      const expMs = decoded.exp * 1000;
+      const now = Date.now();
+      const ttl = expMs - now;
+      if (ttl <= 0) return;
+      const margin = Math.min(60_000, Math.max(ttl * 0.5, 5_000));
+      const delay = Math.max(ttl - margin, 5_000);
+      refreshTimerRef.current = setTimeout(() => {
+        refreshNow();
+      }, delay);
+    },
+    [clearRefreshTimer],
+  );
 
-  const applyToken = useCallback((token: string) => {
-    setAccessToken(token);
-    try { sessionStorage.setItem(STORAGE_KEY, token); } catch {}
-    scheduleRefresh(token);
-  }, [scheduleRefresh]);
+  const applyToken = useCallback(
+    (token: string) => {
+      setAccessToken(token);
+      try {
+        sessionStorage.setItem(STORAGE_KEY, token);
+      } catch {}
+      scheduleRefresh(token);
+    },
+    [scheduleRefresh],
+  );
 
   const resetSession = useCallback(() => {
     clearRefreshTimer();
     setAccessToken(null);
     setUser(null);
-    try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch {}
   }, [clearRefreshTimer]);
 
-  const fetchMe = useCallback(async (token: string) => {
-    try {
-      const me = await AuthAPI.me(token);
-      setUser(me);
-      return true;
-    } catch (e: any) {
-      // eslint-disable-next-line no-console
-      console.warn('[auth] /me falhou:', e?.message);
-      resetSession();
-      return false;
-    }
-  }, [resetSession]);
+  const fetchMe = useCallback(
+    async (token: string) => {
+      try {
+        const me = await AuthAPI.me(token);
+        setUser(me);
+        return true;
+      } catch (e: any) {
+        // eslint-disable-next-line no-console
+        console.warn('[auth] /me falhou:', e?.message);
+        resetSession();
+        return false;
+      }
+    },
+    [resetSession],
+  );
 
   const refreshNow = useCallback(async () => {
     try {
@@ -92,18 +105,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [applyToken, fetchMe, resetSession]);
 
-  const login = useCallback(async (identifier: string, password: string) => {
-    setError(null);
-    try {
-      const data = await AuthAPI.login({ identifier, password });
-      applyToken(data.access_token);
-      await fetchMe(data.access_token);
-      return true;
-    } catch (e: any) {
-      setError(e?.message || 'Failed to sign in');
-      return false;
-    }
-  }, [applyToken, fetchMe]);
+  const login = useCallback(
+    async (identifier: string, password: string) => {
+      setError(null);
+      try {
+        const data = await AuthAPI.login({ identifier, password });
+        applyToken(data.access_token);
+        await fetchMe(data.access_token);
+        return true;
+      } catch (e: any) {
+        setError(e?.message || 'Failed to sign in');
+        return false;
+      }
+    },
+    [applyToken, fetchMe],
+  );
 
   const register = useCallback(async (email: string, password: string, username?: string) => {
     setError(null);
@@ -117,7 +133,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    try { await AuthAPI.logout(); } catch { /* ignore */ }
+    try {
+      await AuthAPI.logout();
+    } catch {
+      /* ignore */
+    }
     resetSession();
   }, [resetSession]);
 
@@ -130,7 +150,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       try {
         let stored: string | null = null;
-        try { stored = sessionStorage.getItem(STORAGE_KEY); } catch {}
+        try {
+          stored = sessionStorage.getItem(STORAGE_KEY);
+        } catch {}
         if (!stored || isExpired(stored)) {
           await refreshNow();
           return;
@@ -142,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => () => clearRefreshTimer(), [clearRefreshTimer]);

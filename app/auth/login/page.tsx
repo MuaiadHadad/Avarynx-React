@@ -211,11 +211,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <Link href="/">
-            <img
-              src="/assets/images/logos/logoA.webp"
-              alt="Logo"
-              style={{ height: '60px' }}
-            />
+            <img src="/assets/images/logos/logoA.webp" alt="Logo" style={{ height: '60px' }} />
           </Link>
         </div>
 
@@ -225,8 +221,7 @@ export default function LoginPage() {
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: 20,
             padding: '2rem 2.2rem 2.4rem',
-            boxShadow:
-              '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
+            boxShadow: '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -388,7 +383,6 @@ export default function LoginPage() {
                       marginBottom: '1.1rem',
                     }}
                   />
-
                 </div>
 
                 <label
@@ -520,54 +514,70 @@ export default function LoginPage() {
                 </div>
               </>
             )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                  {/* Back button */}
-                  {step === 2 && mode === 'login' && (
-                      <button
-                          type="button"
-                          onClick={() => setStep(1)}
-                          aria-label="Terminar sessão"
-                          className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                          style={{width: '37%',  opacity: submitting ? 0.8 : 1,display: 'flex',marginRight: 'auto'  }}
-                      >
-                          <div className="btn-inner">
-                              <span className="btn-icon h-icon"><i className="tji-arrow-left" /></span>
-                              <span className="btn-text">Get back</span>
-                              <span className="btn-icon"><i className="tji-arrow-left" /></span>
-                          </div>
-                      </button>
-                  )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              {/* Back button */}
+              {step === 2 && mode === 'login' && (
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  aria-label="Terminar sessão"
+                  className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                  style={{
+                    width: '37%',
+                    opacity: submitting ? 0.8 : 1,
+                    display: 'flex',
+                    marginRight: 'auto',
+                  }}
+                >
+                  <div className="btn-inner">
+                    <span className="btn-icon h-icon">
+                      <i className="tji-arrow-left" />
+                    </span>
+                    <span className="btn-text">Get back</span>
+                    <span className="btn-icon">
+                      <i className="tji-arrow-left" />
+                    </span>
+                  </div>
+                </button>
+              )}
 
-                  {/* Submit button */}
-                  <button
-                      type="submit"
-                      disabled={
-                          submitting ||
-                          (step === 1 && !email.trim()) ||
-                          (step === 2 && mode === 'login' && !password) ||
-                          (mode === 'register' && (!email.trim() || !password || !username.trim() || passwordsMismatch))
-                      }
-                      className="tj-primary-btn"
-                      style={{ width: '37%', opacity: submitting ? 0.8 : 1,display: 'flex',marginLeft: 'auto' }}
-                      aria-busy={submitting}
-                  >
-                      <div className="btn-inner">
-                          <span className="btn-text">
-                            {submitting
-                                ? mode === 'login'
-                                    ? 'Signing in...'
-                                    : 'Creating account...'
-                                : step === 1 && mode === 'login'
-                                    ? 'Continue'
-                                    : mode === 'login'
-                                        ? 'Sign in'
-                                        : 'Create account'}
-                          </span>
-                          <span className="btn-icon"><i className="tji-arrow-right" /></span>
-
-                      </div>
-                  </button>
-              </div>
+              {/* Submit button */}
+              <button
+                type="submit"
+                disabled={
+                  submitting ||
+                  (step === 1 && !email.trim()) ||
+                  (step === 2 && mode === 'login' && !password) ||
+                  (mode === 'register' &&
+                    (!email.trim() || !password || !username.trim() || passwordsMismatch))
+                }
+                className="tj-primary-btn"
+                style={{
+                  width: '37%',
+                  opacity: submitting ? 0.8 : 1,
+                  display: 'flex',
+                  marginLeft: 'auto',
+                }}
+                aria-busy={submitting}
+              >
+                <div className="btn-inner">
+                  <span className="btn-text">
+                    {submitting
+                      ? mode === 'login'
+                        ? 'Signing in...'
+                        : 'Creating account...'
+                      : step === 1 && mode === 'login'
+                        ? 'Continue'
+                        : mode === 'login'
+                          ? 'Sign in'
+                          : 'Create account'}
+                  </span>
+                  <span className="btn-icon">
+                    <i className="tji-arrow-right" />
+                  </span>
+                </div>
+              </button>
+            </div>
             {/* Mode switch */}
             <div style={{ textAlign: 'center' }}>
               <p style={{ fontSize: 13, opacity: 0.8, margin: 0 }}>

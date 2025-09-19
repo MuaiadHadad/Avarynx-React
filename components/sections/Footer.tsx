@@ -156,10 +156,7 @@ export default function Footer() {
                 <div className="copyright-text">
                   <p>
                     &copy; 2025{' '}
-                    <a
-                      href="https://themeforest.net/user/theme-junction/portfolio"
-                      target="_blank"
-                    >
+                    <a href="https://themeforest.net/user/theme-junction/portfolio" target="_blank">
                       Ainex
                     </a>{' '}
                     All right reserved

@@ -6,13 +6,13 @@
  */
 
 export interface ResetPasswordEmailParams {
-  frontendBaseUrl: string;          // e.g. https://app.example.com
-  token: string;                    // raw reset token
-  ttlHours: number;                 // validade em horas
-  brandName?: string;               // nome da marca (default: 'Avarynx')
-  supportEmail?: string;            // email de suporte opcional
-  userDisplayName?: string | null;  // nome para saudação
-  locale?: 'pt' | 'en';             // idioma simples (pode expandir)
+  frontendBaseUrl: string; // e.g. https://app.example.com
+  token: string; // raw reset token
+  ttlHours: number; // validade em horas
+  brandName?: string; // nome da marca (default: 'Avarynx')
+  supportEmail?: string; // email de suporte opcional
+  userDisplayName?: string | null; // nome para saudação
+  locale?: 'pt' | 'en'; // idioma simples (pode expandir)
 }
 
 export interface ResetPasswordEmailResult {
@@ -38,7 +38,9 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-export function buildResetPasswordEmail(params: ResetPasswordEmailParams): ResetPasswordEmailResult {
+export function buildResetPasswordEmail(
+  params: ResetPasswordEmailParams,
+): ResetPasswordEmailResult {
   const {
     frontendBaseUrl,
     token,
@@ -65,28 +67,32 @@ export function buildResetPasswordEmail(params: ResetPasswordEmailParams): Reset
 
   const subject = locale === 'en' ? 'Reset your password' : 'Redefina a sua palavra-passe';
 
-  const preheader = locale === 'en'
-    ? 'Password reset link inside (valid for limited time).'
-    : 'Link para redefinir a palavra-passe (válido por tempo limitado).';
+  const preheader =
+    locale === 'en'
+      ? 'Password reset link inside (valid for limited time).'
+      : 'Link para redefinir a palavra-passe (válido por tempo limitado).';
 
-  const expl = locale === 'en'
-    ? `You (or someone) requested to reset your ${brandName} account password.`
-    : `Foi feito um pedido para redefinir a palavra-passe da sua conta ${brandName}.`;
+  const expl =
+    locale === 'en'
+      ? `You (or someone) requested to reset your ${brandName} account password.`
+      : `Foi feito um pedido para redefinir a palavra-passe da sua conta ${brandName}.`;
 
   const actionText = locale === 'en' ? 'Reset password' : 'Redefinir palavra-passe';
 
-  const ignore = locale === 'en'
-    ? 'If you did not request this, you can safely ignore this email.'
-    : 'Se não fez este pedido, pode ignorar este email em segurança.';
+  const ignore =
+    locale === 'en'
+      ? 'If you did not request this, you can safely ignore this email.'
+      : 'Se não fez este pedido, pode ignorar este email em segurança.';
 
-  const expires = locale === 'en'
-    ? `This link expires in ${ttlHours} hour${ttlHours > 1 ? 's' : ''} and can be used only once.`
-    : `Este link expira em ${ttlHours} hora${ttlHours > 1 ? 's' : ''} e só pode ser usado uma vez.`;
+  const expires =
+    locale === 'en'
+      ? `This link expires in ${ttlHours} hour${ttlHours > 1 ? 's' : ''} and can be used only once.`
+      : `Este link expira em ${ttlHours} hora${ttlHours > 1 ? 's' : ''} e só pode ser usado uma vez.`;
 
   const supportLine = supportEmail
-    ? (locale === 'en'
-        ? `Need help? Contact us: ${supportEmail}`
-        : `Precisa de ajuda? Contacte-nos: ${supportEmail}`)
+    ? locale === 'en'
+      ? `Need help? Contact us: ${supportEmail}`
+      : `Precisa de ajuda? Contacte-nos: ${supportEmail}`
     : '';
 
   // Texto simples (fallback)
@@ -100,7 +106,9 @@ export function buildResetPasswordEmail(params: ResetPasswordEmailParams): Reset
     supportLine,
     '',
     brandName,
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   // HTML (layout simples com suporte a dark mode & mobile)
   const html = `<!DOCTYPE html>
@@ -170,4 +178,3 @@ export function buildResetPasswordEmail(params: ResetPasswordEmailParams): Reset
 }
 
 export default buildResetPasswordEmail;
-

@@ -9,4 +9,3 @@ export async function GET(request: Request) {
 
 // Optional: reject other methods explicitly (helps avoid 405 confusion)
 export const dynamic = 'force-static';
-

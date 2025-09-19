@@ -7,7 +7,7 @@
 
 // Base da API vem de variável de ambiente para facilitar trocar entre dev/prod.
 // Exemplo em .env.local => NEXT_PUBLIC_API_BASE="https://api.avarynx.mywire.org"
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE).replace(/\/$/, '');
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE.replace(/\/$/, '');
 
 if (!API_BASE) {
   // Aviso em dev somente. Em produção prefira logs de observabilidade.

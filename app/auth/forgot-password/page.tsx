@@ -39,7 +39,11 @@ export default function ForgotPasswordPage() {
       await AuthAPI.forgotPassword(email.trim());
       // Always show generic message
       setDone(true);
-      pushAlert('success', 'If that email exists, you will receive a reset link shortly. Check your spam folder too.', 10000);
+      pushAlert(
+        'success',
+        'If that email exists, you will receive a reset link shortly. Check your spam folder too.',
+        10000,
+      );
     } catch (err: any) {
       // Even in case of error, do not expose if email exists
       // But we can log to console in dev
@@ -48,7 +52,11 @@ export default function ForgotPasswordPage() {
         console.warn('[forgot-password] error:', err?.message);
       }
       setDone(true);
-      pushAlert('info', 'If that email exists, you will receive a reset link shortly. Check your spam folder too.', 10000);
+      pushAlert(
+        'info',
+        'If that email exists, you will receive a reset link shortly. Check your spam folder too.',
+        10000,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -69,24 +77,19 @@ export default function ForgotPasswordPage() {
       }}
     >
       <div style={{ width: '100%', maxWidth: 480 }}>
-          {/* Logo */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <Link href="/">
-                  <img
-                      src="/assets/images/logos/logoA.webp"
-                      alt="Logo"
-                      style={{ height: '60px' }}
-                  />
-              </Link>
-          </div>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <Link href="/">
+            <img src="/assets/images/logos/logoA.webp" alt="Logo" style={{ height: '60px' }} />
+          </Link>
+        </div>
         <div
           style={{
             background: 'linear-gradient(145deg,#1f1a46,#141029)',
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: 20,
             padding: '2rem 2.2rem 2.4rem',
-            boxShadow:
-              '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
+            boxShadow: '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -138,37 +141,51 @@ export default function ForgotPasswordPage() {
                   if (e.key === 'Enter' && !email.trim()) e.preventDefault();
                 }}
               />
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                    <button
-                        type="button"
-                        onClick={() => router.push('/auth/login')}
-                        aria-label="Back to home"
-                        className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                        style={{ width: '37%', opacity: submitting ? 0.8 : 1, display: 'flex', marginRight: 'auto' }}
-                    >
-                        <div className="btn-inner">
-                            <span className="btn-icon h-icon"><i className="tji-arrow-left" /></span>
-                            <span className="btn-text">Get back</span>
-                            <span className="btn-icon"><i className="tji-arrow-left" /></span>
-                        </div>
-                    </button>
-              <button
-                type="submit"
-                disabled={submitting || !email.trim()}
-                className="tj-primary-btn"
-                style={{ width: '50%', opacity: submitting ? 0.8 : 1,display: 'flex',marginLeft: 'auto' }}
-                aria-busy={submitting}
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}
               >
-                <div className="btn-inner">
-                  <span className="btn-text">
-                    {submitting ? 'Sending…' : 'Send reset link'}
-                  </span>
-                  <span className="btn-icon">
-                    <i className="tji-arrow-right" />
-                  </span>
-                </div>
-              </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => router.push('/auth/login')}
+                  aria-label="Back to home"
+                  className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                  style={{
+                    width: '37%',
+                    opacity: submitting ? 0.8 : 1,
+                    display: 'flex',
+                    marginRight: 'auto',
+                  }}
+                >
+                  <div className="btn-inner">
+                    <span className="btn-icon h-icon">
+                      <i className="tji-arrow-left" />
+                    </span>
+                    <span className="btn-text">Get back</span>
+                    <span className="btn-icon">
+                      <i className="tji-arrow-left" />
+                    </span>
+                  </div>
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting || !email.trim()}
+                  className="tj-primary-btn"
+                  style={{
+                    width: '50%',
+                    opacity: submitting ? 0.8 : 1,
+                    display: 'flex',
+                    marginLeft: 'auto',
+                  }}
+                  aria-busy={submitting}
+                >
+                  <div className="btn-inner">
+                    <span className="btn-text">{submitting ? 'Sending…' : 'Send reset link'}</span>
+                    <span className="btn-icon">
+                      <i className="tji-arrow-right" />
+                    </span>
+                  </div>
+                </button>
+              </div>
             </form>
           )}
 
@@ -180,28 +197,33 @@ export default function ForgotPasswordPage() {
               </p>
               <p style={{ opacity: 0.8 }}>Be sure to also check your spam / promotions folder.</p>
               <div style={{ display: 'flex', gap: 12, marginTop: 22 }}>
-                  <button
-                      type="button"
-                      onClick={() => {
-                          setDone(false);
-                          setEmail('');
-                      }}
-                      className="tj-primary-btn"
-                      style={{width: '50%', flex: '0 0 auto' }}
-                  >
-                      <div className="btn-inner">
-                  <span className="btn-text">
-                     another email?
-                  </span>
-                          <span className="btn-icon">
-                    <i className="tji-arrow-right" />
-                  </span>
-                      </div>
-                  </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDone(false);
+                    setEmail('');
+                  }}
+                  className="tj-primary-btn"
+                  style={{ width: '50%', flex: '0 0 auto' }}
+                >
+                  <div className="btn-inner">
+                    <span className="btn-text">another email?</span>
+                    <span className="btn-icon">
+                      <i className="tji-arrow-right" />
+                    </span>
+                  </div>
+                </button>
                 <Link
                   href="/"
                   className="tj-primary-btn btn-light hidden xl:inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                  style={{width: '50%', textDecoration: 'none', flex: 1, textAlign: 'center',display: 'flex',marginLeft: 'auto' }}
+                  style={{
+                    width: '50%',
+                    textDecoration: 'none',
+                    flex: 1,
+                    textAlign: 'center',
+                    display: 'flex',
+                    marginLeft: 'auto',
+                  }}
                 >
                   <div className="btn-inner">
                     <span className="btn-text">Back to Home</span>
@@ -210,7 +232,6 @@ export default function ForgotPasswordPage() {
                     </span>
                   </div>
                 </Link>
-
               </div>
             </div>
           )}

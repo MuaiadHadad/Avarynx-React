@@ -62,15 +62,15 @@ type TalkingHeadLike = {
 export default function HomePage() {
   const { login, register, loginWithGoogle, error: authError } = useAuth();
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [alerts, setAlerts] = useState<AlertData[]>([]); // novos alertas globais
+  // const [alerts, setAlerts] = useState<AlertData[]>([]); // novos alertas globais
 
   // Helper para adicionar alert
-  const pushAlert = (kind: AlertData['kind'], message: string, ttl?: number) => {
-    setAlerts((prev) => [
-      ...prev,
-      { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, kind, message, ttl },
-    ]);
-  };
+  // const pushAlert = (kind: AlertData['kind'], message: string, ttl?: number) => {
+  //   setAlerts((prev) => [
+  //     ...prev,
+  //     { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, kind, message, ttl },
+  //   ]);
+  // };
 
   // Observa erros de auth e mostra alerta fora do modal
   useEffect(() => {

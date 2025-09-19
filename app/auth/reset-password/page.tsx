@@ -29,7 +29,7 @@ function PasswordStrength({ value }: { value: string }) {
       <div
         style={{
           height: 6,
-            borderRadius: 4,
+          borderRadius: 4,
           background: 'rgba(255,255,255,0.12)',
           overflow: 'hidden',
         }}
@@ -107,8 +107,7 @@ export default function ResetPasswordPage() {
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: 20,
               padding: '2rem 2.2rem 2.4rem',
-              boxShadow:
-                '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
+              boxShadow: '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -195,8 +194,7 @@ export default function ResetPasswordPage() {
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: 20,
             padding: '2rem 2.2rem 2.4rem',
-            boxShadow:
-              '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
+            boxShadow: '0 6px 28px -8px rgba(0,0,0,0.55), 0 2px 10px -2px rgba(0,0,0,0.45)',
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -326,9 +324,7 @@ export default function ResetPasswordPage() {
                 aria-busy={submitting}
               >
                 <div className="btn-inner">
-                  <span className="btn-text">
-                    {submitting ? 'Saving…' : 'Save new password'}
-                  </span>
+                  <span className="btn-text">{submitting ? 'Saving…' : 'Save new password'}</span>
                   <span className="btn-icon">
                     <i className="tji-arrow-right" />
                   </span>
